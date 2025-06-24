@@ -110,9 +110,13 @@ export default function InvoicePreview({ invoiceData }: InvoicePreviewProps) {
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">Bill To:</h4>
               <div className="text-gray-600">
-                <p>[Client Name]</p>
-                <p>[Client Address]</p>
-                <p>[City, State, PIN]</p>
+                <p className="font-medium">{invoiceData.clientName || "[Client Name]"}</p>
+                <p>{invoiceData.clientAddress || "[Client Address]"}</p>
+                <p>{invoiceData.clientCity && invoiceData.clientState && invoiceData.clientPin ? 
+                  `${invoiceData.clientCity}, ${invoiceData.clientState}, ${invoiceData.clientPin}` : 
+                  "[City, State, PIN]"}</p>
+                {invoiceData.clientEmail && <p>Email: {invoiceData.clientEmail}</p>}
+                {invoiceData.clientPhone && <p>Phone: {invoiceData.clientPhone}</p>}
               </div>
             </div>
             <div>

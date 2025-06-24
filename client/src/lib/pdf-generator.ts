@@ -46,16 +46,27 @@ export function generateInvoicePDF(invoice: Invoice) {
   doc.text(`Date: ${new Date(invoice.createdAt).toLocaleDateString()}`, 150, 103);
   doc.text(`Assessment Year: ${invoice.assessmentYear}`, 150, 111);
   
-  // Client info placeholder
+  // Client info
   doc.setFontSize(12);
   doc.text('Bill To:', 20, 125);
   doc.setFontSize(10);
-  doc.text('[Client Name]', 20, 135);
-  doc.text('[Client Address]', 20, 143);
-  doc.text('[City, State, PIN]', 20, 151);
+  doc.setTextColor(0, 0, 0);
+  doc.text(invoice.clientName, 20, 135);
+  doc.text(invoice.clientAddress, 20, 143);
+  doc.text(`${invoice.clientCity}, ${invoice.clientState}, ${invoice.clientPin}`, 20, 151);
+  
+  let clientInfoY = 159;
+  if (invoice.clientEmail) {
+    doc.text(`Email: ${invoice.clientEmail}`, 20, clientInfoY);
+    clientInfoY += 8;
+  }
+  if (invoice.clientPhone) {
+    doc.text(`Phone: ${invoice.clientPhone}`, 20, clientInfoY);
+    clientInfoY += 8;
+  }
   
   // Services table header
-  let yPosition = 170;
+  let yPosition = Math.max(170, clientInfoY + 10);
   doc.setFontSize(12);
   doc.setTextColor(0, 0, 0);
   doc.text('Description', 20, yPosition);

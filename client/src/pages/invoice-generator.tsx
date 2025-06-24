@@ -8,6 +8,13 @@ import logoImage from "@assets/8944800c-f7c0-4823-a996-e72890d14956_175080331994
 export default function InvoiceGenerator() {
   const [invoiceData, setInvoiceData] = useState<CreateInvoice>({
     assessmentYear: "",
+    clientName: "",
+    clientAddress: "",
+    clientCity: "",
+    clientState: "",
+    clientPin: "",
+    clientEmail: "",
+    clientPhone: "",
     taxReturnCharges: "",
     accountingCharges: "",
     auditFee: "",
