@@ -32,20 +32,36 @@ This is a full-stack web application built for generating professional tax invoi
 ### Database Schema
 - **Invoices Table**: 
   - Core invoice data (invoice number, assessment year, charges)
+  - Client information fields (name, address, city, state, PIN, email, phone)
   - Decimal fields for monetary values (tax return charges, accounting charges, audit fees)
   - JSON field for additional charges (up to 3 custom charges)
   - Auto-generated timestamps and invoice numbers
+- **Clients Table**: 
+  - Complete customer information management
+  - Name, email, phone, address, city, state, PIN code
+  - Created and updated timestamps
+  - Full CRUD operations with search functionality
 - **Users Table**: Basic user authentication schema (prepared for future auth implementation)
 
 ### API Endpoints
+**Invoice Management:**
 - `POST /api/invoices` - Create new invoice with validation
 - `GET /api/invoices` - Retrieve all invoices
 - `GET /api/invoices/:id` - Retrieve specific invoice by ID
 
+**Client Management:**
+- `POST /api/clients` - Create new client
+- `GET /api/clients` - Retrieve all clients (with optional search)
+- `GET /api/clients/:id` - Retrieve specific client by ID
+- `PUT /api/clients/:id` - Update client information
+- `DELETE /api/clients/:id` - Delete client
+
 ### Frontend Components
-- **InvoiceForm**: Form component with validation for invoice creation
+- **InvoiceForm**: Form component with validation for invoice creation and client information
 - **InvoicePreview**: Real-time preview of invoice as user fills the form
 - **PDF Generation**: Client-side PDF generation using jsPDF library
+- **Clients Page**: Complete client management interface with CRUD operations
+- **Navigation**: Multi-page application with invoice generator and client management
 
 ### Validation & Types
 - Shared TypeScript types between frontend and backend
@@ -110,6 +126,7 @@ This is a full-stack web application built for generating professional tax invoi
 ## Changelog
 - June 24, 2025. Initial setup with in-memory storage
 - June 24, 2025. Added PostgreSQL database with full persistence, migrated from MemStorage to DatabaseStorage
+- June 24, 2025. Added client database and management system with full CRUD operations, search functionality, and navigation
 
 ## User Preferences
 

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertInvoiceSchema, createInvoiceSchema } from "@shared/schema";
+import { insertInvoiceSchema, createInvoiceSchema, insertClientSchema } from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -13,6 +13,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const invoiceData = {
         assessmentYear: parsed.assessmentYear,
+        clientName: parsed.clientName,
+        clientAddress: parsed.clientAddress,
+        clientCity: parsed.clientCity,
+        clientState: parsed.clientState,
+        clientPin: parsed.clientPin,
+        clientEmail: parsed.clientEmail,
+        clientPhone: parsed.clientPhone,
         taxReturnCharges: parsed.taxReturnCharges,
         accountingCharges: parsed.accountingCharges || "0",
         auditFee: parsed.auditFee || "0",
@@ -56,6 +63,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(invoice);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch invoice" });
+    }
+  });
+
+  // Client routes
+  app.post("/api/clients", async (req, res) => {
+    try {
+      const parsed = insertClientSchema.parse(req.body);
+      const client = await storage.createClient(parsed);
+      res.json(client);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: fromZodError(error).toString() });
+      } else {
+        res.status(500).json({ message: "Failed to create client" });
+      }
+    }
+  });
+
+  app.get("/api/clients", async (req, res) => {
+    try {
+      const { search } = req.query;
+      let clients;
+      
+      if (search && typeof search === 'string') {
+        clients = await storage.searchClients(search);
+      } else {
+        clients = await storage.getClients();
+      }
+      
+      res.json(clients);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch clients" });
+    }
+  });
+
+  app.get("/api/clients/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid client ID" });
+      }
+      
+      const client = await storage.getClient(id);
+      if (!client) {
+        return res.status(404).json({ message: "Client not found" });
+      }
+      
+      res.json(client);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch client" });
+    }
+  });
+
+  app.put("/api/clients/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid client ID" });
+      }
+      
+      const parsed = insertClientSchema.partial().parse(req.body);
+      const client = await storage.updateClient(id, parsed);
+      
+      if (!client) {
+        return res.status(404).json({ message: "Client not found" });
+      }
+      
+      res.json(client);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: fromZodError(error).toString() });
+      } else {
+        res.status(500).json({ message: "Failed to update client" });
+      }
+    }
+  });
+
+  app.delete("/api/clients/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid client ID" });
+      }
+      
+      const deleted = await storage.deleteClient(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Client not found" });
+      }
+      
+      res.json({ message: "Client deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete client" });
     }
   });
 
