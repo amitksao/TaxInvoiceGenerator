@@ -7,16 +7,11 @@ import {
   type Client,
   type InsertClient,
   type User,
-  type UpsertUser,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, ilike, desc } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations
-  // (IMPORTANT) these user operations are mandatory for Replit Auth.
-  getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
   
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
   getInvoice(id: number): Promise<Invoice | undefined>;
@@ -186,27 +181,6 @@ export class MemStorage implements IStorage {
 
 // Database Storage Implementation
 export class DatabaseStorage implements IStorage {
-  // User operations
-  // (IMPORTANT) these user operations are mandatory for Replit Auth.
-  async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
-  }
-
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
-  }
 
   async createInvoice(insertInvoice: InsertInvoice): Promise<Invoice> {
     // Generate invoice number
