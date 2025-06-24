@@ -51,9 +51,11 @@ export default function Invoices() {
   const handleDownloadPDF = (invoice: Invoice) => {
     try {
       generateInvoicePDF(invoice);
+      const clientName = invoice.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+      const filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
       toast({
         title: "PDF Downloaded",
-        description: `Invoice ${invoice.invoiceNumber} has been downloaded`,
+        description: `Downloaded as: ${filename}`,
       });
     } catch (error) {
       toast({
