@@ -4,9 +4,10 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { FileText, Users } from "lucide-react";
+import { FileText, Users, History } from "lucide-react";
 import InvoiceGenerator from "@/pages/invoice-generator";
 import Clients from "@/pages/clients";
+import Invoices from "@/pages/invoices";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -27,6 +28,15 @@ function Router() {
                 <span>Invoice Generator</span>
               </Button>
             </Link>
+            <Link href="/invoices">
+              <Button 
+                variant={location === "/invoices" ? "default" : "ghost"} 
+                className="flex items-center space-x-2"
+              >
+                <History className="w-4 h-4" />
+                <span>Invoice History</span>
+              </Button>
+            </Link>
             <Link href="/clients">
               <Button 
                 variant={location === "/clients" ? "default" : "ghost"} 
@@ -43,6 +53,7 @@ function Router() {
       {/* Routes */}
       <Switch>
         <Route path="/" component={InvoiceGenerator} />
+        <Route path="/invoices" component={Invoices} />
         <Route path="/clients" component={Clients} />
         <Route component={NotFound} />
       </Switch>

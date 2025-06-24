@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Search, Edit, Trash2, Users } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Users, FileText, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,15 +10,18 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { insertClientSchema, type Client, type InsertClient } from "@shared/schema";
+import { insertClientSchema, type Client, type InsertClient, type Invoice } from "@shared/schema";
 import { apiRequest, getQueryFn } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 
 export default function Clients() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [selectedClientInvoices, setSelectedClientInvoices] = useState<Invoice[] | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const form = useForm<InsertClient>({
     resolver: zodResolver(insertClientSchema),
@@ -38,6 +41,14 @@ export default function Clients() {
     queryKey: ["/api/clients", searchQuery],
     queryFn: getQueryFn({ on401: "throw" }),
     select: (data) => data as Client[],
+  });
+
+  // Fetch client invoices when needed
+  const { data: clientInvoices } = useQuery({
+    queryKey: ["/api/invoices", "client", selectedClientInvoices],
+    queryFn: getQueryFn({ on401: "throw" }),
+    select: (data) => data as Invoice[],
+    enabled: !!selectedClientInvoices,
   });
 
   // Create client mutation
@@ -140,6 +151,11 @@ export default function Clients() {
       state: "",
       pin: "",
     });
+  };
+
+  const handleViewInvoices = (client: Client) => {
+    // Navigate to invoices page with client filter
+    setLocation(`/invoices?client=${encodeURIComponent(client.name)}`);
   };
 
   return (
@@ -348,7 +364,16 @@ export default function Clients() {
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => handleViewInvoices(client)}
+                        title="View Invoices"
+                      >
+                        <FileText className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => handleEdit(client)}
+                        title="Edit Client"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -357,6 +382,7 @@ export default function Clients() {
                         variant="outline"
                         onClick={() => handleDelete(client.id)}
                         disabled={deleteClientMutation.isPending}
+                        title="Delete Client"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

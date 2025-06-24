@@ -10,6 +10,8 @@ export interface IStorage {
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
   getInvoice(id: number): Promise<Invoice | undefined>;
   getInvoices(): Promise<Invoice[]>;
+  searchInvoices(query: string): Promise<Invoice[]>;
+  getInvoicesByClient(clientId: number): Promise<Invoice[]>;
   
   createClient(client: InsertClient): Promise<Client>;
   getClient(id: number): Promise<Client | undefined>;
@@ -147,6 +149,30 @@ export class MemStorage implements IStorage {
       client.phone?.includes(query)
     );
   }
+
+  async searchInvoices(query: string): Promise<Invoice[]> {
+    const lowerQuery = query.toLowerCase();
+    return Array.from(this.invoices.values()).filter(invoice =>
+      invoice.invoiceNumber.toLowerCase().includes(lowerQuery) ||
+      invoice.clientName.toLowerCase().includes(lowerQuery) ||
+      invoice.clientEmail?.toLowerCase().includes(lowerQuery) ||
+      invoice.clientPhone?.includes(query) ||
+      invoice.assessmentYear.includes(query) ||
+      invoice.clientCity.toLowerCase().includes(lowerQuery) ||
+      invoice.clientState.toLowerCase().includes(lowerQuery)
+    ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getInvoicesByClient(clientId: number): Promise<Invoice[]> {
+    const client = this.clients.get(clientId);
+    if (!client) return [];
+    
+    return Array.from(this.invoices.values()).filter(invoice =>
+      invoice.clientName === client.name &&
+      invoice.clientEmail === client.email &&
+      invoice.clientPhone === client.phone
+    ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
 }
 
 // Database Storage Implementation
@@ -256,6 +282,29 @@ export class DatabaseStorage implements IStorage {
         ilike(clients.name, `%${query}%`)
       )
       .orderBy(clients.name);
+  }
+
+  async searchInvoices(query: string): Promise<Invoice[]> {
+    return await db
+      .select()
+      .from(invoices)
+      .where(
+        ilike(invoices.clientName, `%${query}%`)
+      )
+      .orderBy(desc(invoices.createdAt));
+  }
+
+  async getInvoicesByClient(clientId: number): Promise<Invoice[]> {
+    const client = await this.getClient(clientId);
+    if (!client) return [];
+    
+    return await db
+      .select()
+      .from(invoices)
+      .where(
+        ilike(invoices.clientName, client.name)
+      )
+      .orderBy(desc(invoices.createdAt));
   }
 }
 

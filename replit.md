@@ -46,7 +46,7 @@ This is a full-stack web application built for generating professional tax invoi
 ### API Endpoints
 **Invoice Management:**
 - `POST /api/invoices` - Create new invoice with validation
-- `GET /api/invoices` - Retrieve all invoices
+- `GET /api/invoices` - Retrieve all invoices (with optional search and client filtering)
 - `GET /api/invoices/:id` - Retrieve specific invoice by ID
 
 **Client Management:**
@@ -63,7 +63,8 @@ This is a full-stack web application built for generating professional tax invoi
 - **InvoicePreview**: Real-time preview of invoice as user fills the form
 - **PDF Generation**: Client-side PDF generation using jsPDF library
 - **Clients Page**: Complete client management interface with CRUD operations
-- **Navigation**: Multi-page application with invoice generator and client management
+- **Invoice History**: Comprehensive invoice listing with search and filtering capabilities
+- **Navigation**: Multi-page application with invoice generator, history, and client management
 
 ### Validation & Types
 - Shared TypeScript types between frontend and backend
@@ -130,6 +131,8 @@ This is a full-stack web application built for generating professional tax invoi
 - June 24, 2025. Added PostgreSQL database with full persistence, migrated from MemStorage to DatabaseStorage
 - June 24, 2025. Added client database and management system with full CRUD operations, search functionality, and navigation
 - June 24, 2025. Implemented client search functionality in invoice form for auto-populating existing customer details
+- June 24, 2025. Reorganized form layout with compact client information section and separate fees subsection
+- June 24, 2025. Added invoice history page with comprehensive search functionality by client name, invoice number, email, phone, city, state, and assessment year
 
 ## User Preferences
 

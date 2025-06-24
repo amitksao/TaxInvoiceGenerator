@@ -40,7 +40,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all invoices
   app.get("/api/invoices", async (req, res) => {
     try {
-      const invoices = await storage.getInvoices();
+      const { search, clientId } = req.query;
+      let invoices = await storage.getInvoices();
+      
+      // Filter by client ID if provided
+      if (clientId && typeof clientId === 'string') {
+        const id = parseInt(clientId);
+        if (!isNaN(id)) {
+          invoices = invoices.filter(invoice => 
+            invoice.clientName && invoice.clientEmail && invoice.clientPhone &&
+            // This would need client relationship - for now filter by client info
+            false // TODO: Add proper client relationship
+          );
+        }
+      }
+      
+      // Filter by search query if provided
+      if (search && typeof search === 'string') {
+        const query = search.toLowerCase();
+        invoices = invoices.filter(invoice =>
+          invoice.invoiceNumber.toLowerCase().includes(query) ||
+          invoice.clientName.toLowerCase().includes(query) ||
+          invoice.clientEmail?.toLowerCase().includes(query) ||
+          invoice.clientPhone?.includes(query) ||
+          invoice.assessmentYear.includes(query) ||
+          invoice.clientCity.toLowerCase().includes(query) ||
+          invoice.clientState.toLowerCase().includes(query)
+        );
+      }
+      
       res.json(invoices);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch invoices" });
