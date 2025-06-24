@@ -127,6 +127,10 @@ export function generateInvoicePDF(invoice: Invoice) {
   doc.text('Thank you for your business!', 105, yPosition, { align: 'center' });
   doc.text('For any queries, please contact us at dipakadv.sao@gmail.com or 9778780582/9434001881', 105, yPosition + 8, { align: 'center' });
   
+  // Generate filename with client name, invoice number, and assessment year
+  const clientName = invoice.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+  const filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
+  
   // Save the PDF
-  doc.save(`invoice-${invoice.invoiceNumber}.pdf`);
+  doc.save(filename);
 }

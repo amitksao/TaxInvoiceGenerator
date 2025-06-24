@@ -133,6 +133,8 @@ This is a full-stack web application built for generating professional tax invoi
 - June 24, 2025. Implemented client search functionality in invoice form for auto-populating existing customer details
 - June 24, 2025. Reorganized form layout with compact client information section and separate fees subsection
 - June 24, 2025. Added invoice history page with comprehensive search functionality by client name, invoice number, email, phone, city, state, and assessment year
+- June 24, 2025. Updated PDF naming convention to "ClientName_InvoiceNumber_AssessmentYear.pdf" for easy file organization
+- June 24, 2025. Implemented email functionality using SendGrid to send invoices directly to clients with PDF attachments
 
 ## User Preferences
 

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Search, FileText, Download, Calendar, User, Eye } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Search, FileText, Download, Calendar, User, Eye, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { getQueryFn } from "@/lib/queryClient";
+import { getQueryFn, apiRequest } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/currency";
 import { generateInvoicePDF } from "@/lib/pdf-generator";
 import type { Invoice } from "@shared/schema";
@@ -48,6 +48,30 @@ export default function Invoices() {
     );
   });
 
+  const sendEmailMutation = useMutation({
+    mutationFn: async (invoiceId: number) => {
+      const response = await apiRequest(`/api/invoices/${invoiceId}/send-email`, "POST");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to send email");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Email Sent",
+        description: "Invoice has been sent to the client's email address.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Email Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleDownloadPDF = (invoice: Invoice) => {
     try {
       generateInvoicePDF(invoice);
@@ -64,6 +88,18 @@ export default function Invoices() {
         variant: "destructive",
       });
     }
+  };
+
+  const handleSendEmail = (invoice: Invoice) => {
+    if (!invoice.clientEmail) {
+      toast({
+        title: "Email Required",
+        description: "Client email is required to send invoice.",
+        variant: "destructive",
+      });
+      return;
+    }
+    sendEmailMutation.mutate(invoice.id);
   };
 
   const formatDate = (date: string | Date) => {
@@ -162,15 +198,26 @@ export default function Invoices() {
                       <div className="text-lg font-semibold text-green-600">
                         {formatCurrency(parseFloat(invoice.totalAmount))}
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDownloadPDF(invoice)}
-                        className="mt-1"
-                      >
-                        <Download className="w-4 h-4 mr-1" />
-                        PDF
-                      </Button>
+                      <div className="flex gap-1 mt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDownloadPDF(invoice)}
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          PDF
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSendEmail(invoice)}
+                          disabled={!invoice.clientEmail || sendEmailMutation.isPending}
+                          title={!invoice.clientEmail ? "Client email required" : "Send invoice via email"}
+                        >
+                          <Mail className="w-4 h-4 mr-1" />
+                          Email
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardHeader>
