@@ -1,6 +1,16 @@
-import { users, invoices, clients, type User, type InsertUser, type Invoice, type InsertInvoice, type Client, type InsertClient } from "@shared/schema";
+import {
+  invoices,
+  clients,
+  users,
+  type Invoice,
+  type InsertInvoice,
+  type Client,
+  type InsertClient,
+  type User,
+  type UpsertUser,
+} from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, ilike } from "drizzle-orm";
+import { eq, ilike, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
