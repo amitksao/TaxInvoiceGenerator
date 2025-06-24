@@ -1,4 +1,6 @@
 import { users, invoices, type User, type InsertUser, type Invoice, type InsertInvoice } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -81,4 +83,66 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database Storage Implementation
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async createInvoice(insertInvoice: InsertInvoice): Promise<Invoice> {
+    // Generate invoice number
+    const currentYear = new Date().getFullYear();
+    const existingInvoices = await db.select().from(invoices);
+    const invoiceNumber = `INV-${currentYear}-${String(existingInvoices.length + 1).padStart(3, '0')}`;
+    
+    // Calculate total amount
+    const taxReturn = parseFloat(insertInvoice.taxReturnCharges);
+    const accounting = parseFloat(insertInvoice.accountingCharges || "0");
+    const audit = parseFloat(insertInvoice.auditFee || "0");
+    
+    const additionalCharges = JSON.parse(insertInvoice.additionalCharges);
+    const additionalTotal = additionalCharges.reduce((sum: number, charge: any) => sum + (charge.amount || 0), 0);
+    
+    const totalAmount = (taxReturn + accounting + audit + additionalTotal).toFixed(2);
+    
+    const [invoice] = await db
+      .insert(invoices)
+      .values({
+        invoiceNumber,
+        assessmentYear: insertInvoice.assessmentYear,
+        taxReturnCharges: insertInvoice.taxReturnCharges,
+        accountingCharges: insertInvoice.accountingCharges || null,
+        auditFee: insertInvoice.auditFee || null,
+        additionalCharges: insertInvoice.additionalCharges,
+        totalAmount,
+      })
+      .returning();
+    
+    return invoice;
+  }
+
+  async getInvoice(id: number): Promise<Invoice | undefined> {
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, id));
+    return invoice || undefined;
+  }
+
+  async getInvoices(): Promise<Invoice[]> {
+    return await db.select().from(invoices).orderBy(desc(invoices.createdAt));
+  }
+}
+
+export const storage = new DatabaseStorage();

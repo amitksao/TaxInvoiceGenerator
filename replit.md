@@ -21,10 +21,11 @@ This is a full-stack web application built for generating professional tax invoi
 - **Middleware**: Express middleware for JSON parsing, CORS, and request logging
 
 ### Data Layer
-- **Database**: PostgreSQL (configured via Replit environment)
+- **Database**: PostgreSQL (Replit-managed database with full persistence)
 - **ORM**: Drizzle ORM for type-safe database operations
 - **Schema Management**: Drizzle Kit for migrations and schema management
 - **Connection**: Neon Database serverless driver for PostgreSQL connectivity
+- **Storage**: DatabaseStorage class implementing full CRUD operations
 
 ## Key Components
 
@@ -107,7 +108,8 @@ This is a full-stack web application built for generating professional tax invoi
 4. Database migrations run via Drizzle Kit
 
 ## Changelog
-- June 24, 2025. Initial setup
+- June 24, 2025. Initial setup with in-memory storage
+- June 24, 2025. Added PostgreSQL database with full persistence, migrated from MemStorage to DatabaseStorage
 
 ## User Preferences
 
