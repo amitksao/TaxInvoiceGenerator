@@ -175,7 +175,7 @@ export default function InvoicePreview({ invoiceData }: InvoicePreviewProps) {
           <div className="mt-8 pt-6 border-t border-gray-200">
             <div className="text-center text-sm text-gray-500">
               <p>Thank you for your business!</p>
-              <p>For any queries, please contact us at [email] or [phone]</p>
+              <p>For any queries, please contact us at dipakadv.sao@gmail.com or 9778780582/9434001881</p>
             </div>
           </div>
         </div>

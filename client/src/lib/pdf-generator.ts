@@ -114,7 +114,7 @@ export function generateInvoicePDF(invoice: Invoice) {
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
   doc.text('Thank you for your business!', 105, yPosition, { align: 'center' });
-  doc.text('For any queries, please contact us at [email] or [phone]', 105, yPosition + 8, { align: 'center' });
+  doc.text('For any queries, please contact us at dipakadv.sao@gmail.com or 9778780582/9434001881', 105, yPosition + 8, { align: 'center' });
   
   // Save the PDF
   doc.save(`invoice-${invoice.invoiceNumber}.pdf`);
