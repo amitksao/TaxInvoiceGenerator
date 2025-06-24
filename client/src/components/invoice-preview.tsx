@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { File, Circle } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import type { CreateInvoice } from "@shared/schema";
+import logoImage from "@assets/8944800c-f7c0-4823-a996-e72890d14956_1750803319943.jpeg";
 
 interface InvoicePreviewProps {
   invoiceData: CreateInvoice;
@@ -77,8 +78,12 @@ export default function InvoicePreview({ invoiceData }: InvoicePreviewProps) {
           {/* Invoice Header */}
           <div className="flex items-start justify-between mb-8">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                <File className="text-primary-foreground text-xl" />
+              <div className="w-16 h-16 rounded-lg overflow-hidden">
+                <img 
+                  src={logoImage} 
+                  alt="Company Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">Tax Consultation Services</h3>

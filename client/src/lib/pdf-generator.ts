@@ -1,12 +1,20 @@
 import jsPDF from 'jspdf';
 import type { Invoice } from '@shared/schema';
 import { formatCurrency } from './currency';
+import logoImage from "@assets/8944800c-f7c0-4823-a996-e72890d14956_1750803319943.jpeg";
 
 export function generateInvoicePDF(invoice: Invoice) {
   const doc = new jsPDF();
   
   // Set font
   doc.setFont('helvetica', 'normal');
+  
+  // Add logo
+  try {
+    doc.addImage(logoImage, 'JPEG', 20, 15, 20, 20);
+  } catch (error) {
+    console.warn('Could not add logo to PDF:', error);
+  }
   
   // Header
   doc.setFontSize(20);
@@ -16,10 +24,10 @@ export function generateInvoicePDF(invoice: Invoice) {
   // Company info
   doc.setFontSize(16);
   doc.setTextColor(0, 0, 0);
-  doc.text('Tax Consultation Services', 20, 30);
+  doc.text('Tax Consultation Services', 45, 25);
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
-  doc.text('Professional Tax & Accounting Solutions', 20, 38);
+  doc.text('Professional Tax & Accounting Solutions', 45, 32);
   
   // Invoice details
   doc.setFontSize(10);
