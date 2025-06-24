@@ -37,8 +37,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all invoices
-  app.get("/api/invoices", async (req, res) => {
+  // Get all invoices - protected route
+  app.get("/api/invoices", isAuthenticated, async (req, res) => {
     try {
       const { search, clientId } = req.query;
       let invoices = await storage.getInvoices();
@@ -168,7 +168,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/clients/:id", async (req, res) => {
+  // Delete a client - protected route
+  app.delete("/api/clients/:id", isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
