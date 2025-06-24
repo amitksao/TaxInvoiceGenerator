@@ -9,43 +9,53 @@ export function generateInvoicePDF(invoice: Invoice) {
   // Set font
   doc.setFont('helvetica', 'normal');
   
-  // Add logo
+  // Add logo centered
   try {
-    doc.addImage(logoImage, 'JPEG', 20, 15, 20, 20);
+    doc.addImage(logoImage, 'JPEG', 95, 15, 20, 20);
   } catch (error) {
     console.warn('Could not add logo to PDF:', error);
   }
   
-  // Header
-  doc.setFontSize(20);
-  doc.setTextColor(25, 118, 210); // Primary blue color
-  doc.text('INVOICE', 150, 30);
-  
-  // Company info
+  // Company header - centered
   doc.setFontSize(16);
   doc.setTextColor(0, 0, 0);
-  doc.text('Tax Consultation Services', 45, 25);
+  doc.text('Dipak Kumar Sao & Associates', 105, 45, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text('(Advocate & Tax Consultant)', 105, 52, { align: 'center' });
+  
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
-  doc.text('Professional Tax & Accounting Solutions', 45, 32);
+  doc.text('Northlake Road, Besides Manas Sarovar, Po. & Dist. Purulia.', 105, 59, { align: 'center' });
+  doc.text('Mobile - 9778780582/9434001881', 105, 66, { align: 'center' });
+  doc.text('E-Mail : dipakadv.sao@gmail.com', 105, 73, { align: 'center' });
+  
+  // Separator line
+  doc.line(20, 80, 190, 80);
+  
+  // Invoice header
+  doc.setFontSize(20);
+  doc.setTextColor(25, 118, 210); // Primary blue color
+  doc.text('INVOICE', 20, 95);
   
   // Invoice details
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
-  doc.text(`Invoice #: ${invoice.invoiceNumber}`, 150, 40);
-  doc.text(`Date: ${new Date(invoice.createdAt).toLocaleDateString()}`, 150, 48);
-  doc.text(`Assessment Year: ${invoice.assessmentYear}`, 150, 56);
+  doc.text(`Invoice #: ${invoice.invoiceNumber}`, 150, 95);
+  doc.text(`Date: ${new Date(invoice.createdAt).toLocaleDateString()}`, 150, 103);
+  doc.text(`Assessment Year: ${invoice.assessmentYear}`, 150, 111);
   
   // Client info placeholder
   doc.setFontSize(12);
-  doc.text('Bill To:', 20, 70);
+  doc.text('Bill To:', 20, 125);
   doc.setFontSize(10);
-  doc.text('[Client Name]', 20, 80);
-  doc.text('[Client Address]', 20, 88);
-  doc.text('[City, State, PIN]', 20, 96);
+  doc.text('[Client Name]', 20, 135);
+  doc.text('[Client Address]', 20, 143);
+  doc.text('[City, State, PIN]', 20, 151);
   
   // Services table header
-  let yPosition = 120;
+  let yPosition = 170;
   doc.setFontSize(12);
   doc.setTextColor(0, 0, 0);
   doc.text('Description', 20, yPosition);

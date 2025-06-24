@@ -75,24 +75,33 @@ export default function InvoicePreview({ invoiceData }: InvoicePreviewProps) {
         </div>
 
         <div className="border border-gray-200 rounded-lg p-6 bg-white">
-          {/* Invoice Header */}
-          <div className="flex items-start justify-between mb-8">
-            <div className="flex items-center space-x-3">
-              <div className="w-16 h-16 rounded-lg overflow-hidden">
+          {/* Company Header */}
+          <div className="text-center mb-8 border-b-2 border-gray-200 pb-6">
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 rounded-lg overflow-hidden">
                 <img 
                   src={logoImage} 
                   alt="Company Logo" 
                   className="w-full h-full object-contain"
                 />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">Tax Consultation Services</h3>
-                <p className="text-gray-600">Professional Tax & Accounting Solutions</p>
-              </div>
             </div>
-            <div className="text-right">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Dipak Kumar Sao & Associates</h2>
+            <p className="text-lg text-gray-700 mb-1">(Advocate & Tax Consultant)</p>
+            <p className="text-sm text-gray-600 mb-1">Northlake Road, Besides Manas Sarovar, Po. & Dist. Purulia.</p>
+            <p className="text-sm text-gray-600 mb-1">Mobile - 9778780582/9434001881</p>
+            <p className="text-sm text-gray-600">E-Mail : dipakadv.sao@gmail.com</p>
+          </div>
+
+          {/* Invoice Header */}
+          <div className="flex items-start justify-between mb-8">
+            <div>
               <h3 className="text-2xl font-bold text-app-primary">INVOICE</h3>
               <p className="text-gray-600">Invoice #: {invoiceNumber}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-gray-600">Date: {currentDate}</p>
+              <p className="text-gray-600">Due Date: {dueDateFormatted}</p>
             </div>
           </div>
 
@@ -109,9 +118,7 @@ export default function InvoicePreview({ invoiceData }: InvoicePreviewProps) {
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">Service Details:</h4>
               <div className="text-gray-600">
-                <p>Assessment Year: <span>{invoiceData.assessmentYear || "-"}</span></p>
-                <p>Date: <span>{currentDate}</span></p>
-                <p>Due Date: <span>{dueDateFormatted}</span></p>
+                <p>Assessment Year: <span className="font-medium">{invoiceData.assessmentYear || "-"}</span></p>
               </div>
             </div>
           </div>

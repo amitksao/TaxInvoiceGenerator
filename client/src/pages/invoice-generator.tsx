@@ -39,8 +39,8 @@ export default function InvoiceGenerator() {
                 />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Tax Invoice Generator</h1>
-                <p className="text-sm text-app-secondary">Professional Invoice Management System</p>
+                <h1 className="text-xl font-bold text-gray-900">Dipak Kumar Sao & Associates</h1>
+                <p className="text-sm text-app-secondary">Tax Invoice Generator</p>
               </div>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
