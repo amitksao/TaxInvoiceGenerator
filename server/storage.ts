@@ -57,9 +57,13 @@ export class MemStorage implements IStorage {
     const totalAmount = (taxReturn + accounting + audit + additionalTotal).toFixed(2);
     
     const invoice: Invoice = {
-      ...insertInvoice,
       id,
       invoiceNumber,
+      assessmentYear: insertInvoice.assessmentYear,
+      taxReturnCharges: insertInvoice.taxReturnCharges,
+      accountingCharges: insertInvoice.accountingCharges || null,
+      auditFee: insertInvoice.auditFee || null,
+      additionalCharges: insertInvoice.additionalCharges,
       totalAmount,
       createdAt: new Date(),
     };
