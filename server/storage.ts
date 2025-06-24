@@ -7,11 +7,16 @@ import {
   type Client,
   type InsertClient,
   type User,
+  type RegisterRequest,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, ilike, desc } from "drizzle-orm";
 
 export interface IStorage {
+  // User operations for authentication
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(userData: RegisterRequest & { password: string }): Promise<User>;
+  getUserById(id: number): Promise<User | undefined>;
   
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
   getInvoice(id: number): Promise<Invoice | undefined>;
@@ -181,6 +186,27 @@ export class MemStorage implements IStorage {
 
 // Database Storage Implementation
 export class DatabaseStorage implements IStorage {
+  // User operations for authentication
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async createUser(userData: RegisterRequest & { password: string }): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        username: userData.username,
+        password: userData.password,
+      })
+      .returning();
+    return user;
+  }
+
+  async getUserById(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
 
   async createInvoice(insertInvoice: InsertInvoice): Promise<Invoice> {
     // Generate invoice number

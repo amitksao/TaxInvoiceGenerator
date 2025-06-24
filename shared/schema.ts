@@ -55,14 +55,27 @@ export type CreateInvoice = z.infer<typeof createInvoiceSchema>;
 export type Invoice = typeof invoices.$inferSelect;
 export type AdditionalCharge = z.infer<typeof additionalChargeSchema>;
 
-// Simple users table for basic admin tracking
+// Admin users table for authentication
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
+  password: text("password").notNull(), // Will store hashed passwords
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const registerSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 export type User = typeof users.$inferSelect;
+export type LoginRequest = z.infer<typeof loginSchema>;
+export type RegisterRequest = z.infer<typeof registerSchema>;
 
 // Client schema for customer management
 export const clients = pgTable("clients", {

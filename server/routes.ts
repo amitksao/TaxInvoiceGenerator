@@ -1,13 +1,58 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertInvoiceSchema, createInvoiceSchema, insertClientSchema } from "@shared/schema";
+import { insertInvoiceSchema, createInvoiceSchema, insertClientSchema, loginSchema, registerSchema } from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { authenticateToken, loginUser, registerUser, type AuthenticatedRequest } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = loginSchema.parse(req.body);
+      
+      const result = await loginUser(username, password);
+      if (!result) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      
+      res.json(result);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: fromZodError(error).toString() });
+      }
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, password } = registerSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      const result = await registerUser(username, password);
+      res.status(201).json(result);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: fromZodError(error).toString() });
+      }
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
+  app.get("/api/auth/user", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    res.json({ user: req.user });
+  });
+
+  // Protected routes - require authentication
   // Create invoice
-  app.post("/api/invoices", async (req, res) => {
+  app.post("/api/invoices", authenticateToken, async (req, res) => {
     try {
       const parsed = createInvoiceSchema.parse(req.body);
       
@@ -37,8 +82,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all invoices
-  app.get("/api/invoices", async (req, res) => {
+  // Get all invoices - protected
+  app.get("/api/invoices", authenticateToken, async (req, res) => {
     try {
       const { search, clientId } = req.query;
       let invoices = await storage.getInvoices();
@@ -168,8 +213,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete a client
-  app.delete("/api/clients/:id", async (req, res) => {
+  // Delete a client - protected
+  app.delete("/api/clients/:id", authenticateToken, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
