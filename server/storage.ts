@@ -33,9 +33,10 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+  private users: Map<number, User>;
   private invoices: Map<number, Invoice>;
   private clients: Map<number, Client>;
+  private currentUserId: number;
   private currentInvoiceId: number;
   private currentClientId: number;
   private invoiceCounter: number;
@@ -44,26 +45,31 @@ export class MemStorage implements IStorage {
     this.users = new Map();
     this.invoices = new Map();
     this.clients = new Map();
+    this.currentUserId = 1;
     this.currentInvoiceId = 1;
     this.currentClientId = 1;
     this.invoiceCounter = 1;
   }
 
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
+  // User operations for authentication
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    return Array.from(this.users.values()).find(user => user.username === username);
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
+  async createUser(userData: RegisterRequest & { password: string }): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    const user: User = {
+      id,
+      username: userData.username,
+      password: userData.password,
+      createdAt: new Date(),
+    };
     this.users.set(id, user);
     return user;
+  }
+
+  async getUserById(id: number): Promise<User | undefined> {
+    return this.users.get(id);
   }
 
   async createInvoice(insertInvoice: InsertInvoice): Promise<Invoice> {
