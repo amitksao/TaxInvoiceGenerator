@@ -262,56 +262,56 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                 </Dialog>
               </div>
               
-              {/* Client Name */}
-              <FormField
-                control={form.control}
-                name="clientName"
-                render={({ field }) => (
-                  <FormItem className="mb-4">
-                    <FormLabel className="text-sm font-medium text-gray-700">
-                      Client Name <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter client name"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
-                          handleInputChange('clientName', e.target.value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Compact Client Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <FormField
+                  control={form.control}
+                  name="clientName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Client Name <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter client name"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            handleInputChange('clientName', e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {/* Client Address */}
-              <FormField
-                control={form.control}
-                name="clientAddress"
-                render={({ field }) => (
-                  <FormItem className="mb-4">
-                    <FormLabel className="text-sm font-medium text-gray-700">
-                      Address <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter full address"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
-                          handleInputChange('clientAddress', e.target.value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="clientAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Address <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter full address"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            handleInputChange('clientAddress', e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              {/* City, State, PIN in a grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
                 <FormField
                   control={form.control}
                   name="clientCity"
@@ -364,7 +364,7 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        PIN Code <span className="text-red-500">*</span>
+                        PIN <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -380,22 +380,19 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                     </FormItem>
                   )}
                 />
-              </div>
 
-              {/* Email and Phone */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <FormField
                   control={form.control}
                   name="clientEmail"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        Email (Optional)
+                        Email
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="client@example.com"
+                          placeholder="Email"
                           {...field}
                           onChange={(e) => {
                             field.onChange(e.target.value);
@@ -414,11 +411,11 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        Phone Number (Optional)
+                        Phone
                       </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Phone number"
+                          placeholder="Phone"
                           {...field}
                           onChange={(e) => {
                             field.onChange(e.target.value);
@@ -433,98 +430,105 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
               </div>
             </div>
 
-            {/* Tax Return Charges */}
-            <FormField
-              control={form.control}
-              name="taxReturnCharges"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">
-                    Tax Return Charges <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2 text-gray-500">₹</span>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className="pl-8"
-                        placeholder="0.00"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
-                          handleInputChange('taxReturnCharges', e.target.value);
-                        }}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Fees Section */}
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Fees</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Tax Return Charges */}
+                <FormField
+                  control={form.control}
+                  name="taxReturnCharges"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Tax Return Charges <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            className="pl-8"
+                            placeholder="0.00"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                              handleInputChange('taxReturnCharges', e.target.value);
+                            }}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {/* Accounting Charges */}
-            <FormField
-              control={form.control}
-              name="accountingCharges"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">
-                    Accounting Charges (if applicable)
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2 text-gray-500">₹</span>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className="pl-8"
-                        placeholder="0.00"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
-                          handleInputChange('accountingCharges', e.target.value);
-                        }}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                {/* Accounting Charges */}
+                <FormField
+                  control={form.control}
+                  name="accountingCharges"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Accounting Charges
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            className="pl-8"
+                            placeholder="0.00"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                              handleInputChange('accountingCharges', e.target.value);
+                            }}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {/* Audit Fee */}
-            <FormField
-              control={form.control}
-              name="auditFee"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">
-                    Audit Fee (if applicable)
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2 text-gray-500">₹</span>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className="pl-8"
-                        placeholder="0.00"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
-                          handleInputChange('auditFee', e.target.value);
-                        }}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                {/* Audit Fee */}
+                <FormField
+                  control={form.control}
+                  name="auditFee"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">
+                        Audit Fee
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            className="pl-8"
+                            placeholder="0.00"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                              handleInputChange('auditFee', e.target.value);
+                            }}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
 
             {/* Additional Charges */}
             <div className="border-t pt-6">
