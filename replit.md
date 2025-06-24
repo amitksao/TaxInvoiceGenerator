@@ -58,6 +58,8 @@ This is a full-stack web application built for generating professional tax invoi
 
 ### Frontend Components
 - **InvoiceForm**: Form component with validation for invoice creation and client information
+  - Integrated client search functionality for populating existing customer details
+  - Modal dialog for searching and selecting clients from database
 - **InvoicePreview**: Real-time preview of invoice as user fills the form
 - **PDF Generation**: Client-side PDF generation using jsPDF library
 - **Clients Page**: Complete client management interface with CRUD operations
@@ -127,6 +129,7 @@ This is a full-stack web application built for generating professional tax invoi
 - June 24, 2025. Initial setup with in-memory storage
 - June 24, 2025. Added PostgreSQL database with full persistence, migrated from MemStorage to DatabaseStorage
 - June 24, 2025. Added client database and management system with full CRUD operations, search functionality, and navigation
+- June 24, 2025. Implemented client search functionality in invoice form for auto-populating existing customer details
 
 ## User Preferences
 

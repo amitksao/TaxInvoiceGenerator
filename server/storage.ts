@@ -105,6 +105,8 @@ export class MemStorage implements IStorage {
     const client: Client = {
       ...insertClient,
       id,
+      email: insertClient.email || null,
+      phone: insertClient.phone || null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -243,7 +245,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteClient(id: number): Promise<boolean> {
     const result = await db.delete(clients).where(eq(clients.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async searchClients(query: string): Promise<Client[]> {

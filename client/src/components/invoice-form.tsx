@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Eye, FileText } from "lucide-react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { Eye, FileText, Search, User } from "lucide-react";
 import logoImage from "@assets/8944800c-f7c0-4823-a996-e72890d14956_1750803319943.jpeg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,9 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { createInvoiceSchema, type CreateInvoice } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
+import { createInvoiceSchema, type CreateInvoice, type Client } from "@shared/schema";
+import { apiRequest, getQueryFn } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/currency";
 import { generateInvoicePDF } from "@/lib/pdf-generator";
 
@@ -23,12 +24,22 @@ interface InvoiceFormProps {
 
 export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceFormProps) {
   const [invoiceNumber] = useState(`INV-${new Date().getFullYear()}-001`);
+  const [isClientSearchOpen, setIsClientSearchOpen] = useState(false);
+  const [clientSearchQuery, setClientSearchQuery] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<CreateInvoice>({
     resolver: zodResolver(createInvoiceSchema),
     defaultValues: invoiceData,
+  });
+
+  // Fetch clients for search
+  const { data: clients } = useQuery({
+    queryKey: ["/api/clients", clientSearchQuery],
+    queryFn: getQueryFn({ on401: "throw" }),
+    select: (data) => data as Client[],
+    enabled: isClientSearchOpen,
   });
 
   const createInvoiceMutation = useMutation({
@@ -114,6 +125,34 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
     });
   };
 
+  const handleSelectClient = (client: Client) => {
+    const clientData = {
+      clientName: client.name,
+      clientAddress: client.address,
+      clientCity: client.city,
+      clientState: client.state,
+      clientPin: client.pin,
+      clientEmail: client.email || "",
+      clientPhone: client.phone || "",
+    };
+
+    // Update form values
+    Object.entries(clientData).forEach(([key, value]) => {
+      form.setValue(key as keyof CreateInvoice, value);
+    });
+
+    // Update invoice data state
+    setInvoiceData({ ...invoiceData, ...clientData });
+    
+    setIsClientSearchOpen(false);
+    setClientSearchQuery("");
+    
+    toast({
+      title: "Client Selected",
+      description: `${client.name}'s information has been populated`,
+    });
+  };
+
   return (
     <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
       <CardContent className="p-6">
@@ -162,7 +201,66 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
 
             {/* Client Information Section */}
             <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Client Information</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Client Information</h3>
+                <Dialog open={isClientSearchOpen} onOpenChange={setIsClientSearchOpen}>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm">
+                      <Search className="w-4 h-4 mr-2" />
+                      Search Existing Client
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Select Existing Client</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          placeholder="Search clients by name, email, or phone..."
+                          value={clientSearchQuery}
+                          onChange={(e) => setClientSearchQuery(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      <div className="max-h-96 overflow-y-auto space-y-2">
+                        {clients?.filter(client => 
+                          !clientSearchQuery || 
+                          client.name.toLowerCase().includes(clientSearchQuery.toLowerCase()) ||
+                          client.email?.toLowerCase().includes(clientSearchQuery.toLowerCase()) ||
+                          client.phone?.includes(clientSearchQuery)
+                        ).map(client => (
+                          <div
+                            key={client.id}
+                            className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                            onClick={() => handleSelectClient(client)}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-medium text-gray-900">{client.name}</h4>
+                                <p className="text-sm text-gray-600">{client.email}</p>
+                                <p className="text-sm text-gray-500">
+                                  {client.address}, {client.city}, {client.state}, {client.pin}
+                                </p>
+                                {client.phone && <p className="text-sm text-gray-500">📞 {client.phone}</p>}
+                              </div>
+                              <User className="w-5 h-5 text-gray-400" />
+                            </div>
+                          </div>
+                        ))}
+                        {clients?.length === 0 && (
+                          <div className="text-center py-8 text-gray-500">
+                            <User className="mx-auto h-12 w-12 text-gray-300" />
+                            <p className="mt-2">No clients found</p>
+                            <p className="text-sm">Try adjusting your search query</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
               
               {/* Client Name */}
               <FormField
