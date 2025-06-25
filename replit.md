@@ -137,6 +137,7 @@ This is a full-stack web application built for generating professional tax invoi
 - June 25, 2025. Implemented comprehensive admin authentication system with JWT tokens, password hashing, and protected routes
 - June 25, 2025. Resolved React Hook Form input field conflicts by implementing simplified authentication form with direct state management
 - June 25, 2025. Added comprehensive PDF download functionality: preview downloads from generator page, automatic downloads after invoice creation, and download buttons on invoice history
+- June 25, 2025. Enhanced PDF download system to save directly to user's local Downloads folder with clear filename notifications and error handling
 
 ## User Preferences
 

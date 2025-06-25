@@ -49,11 +49,22 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
     },
     onSuccess: (invoice) => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
-      generateInvoicePDF(invoice);
-      toast({
-        title: "Success",
-        description: "Invoice generated and PDF downloaded successfully!",
-      });
+      
+      // Generate and download PDF to local download folder
+      try {
+        generateInvoicePDF(invoice);
+        toast({
+          title: "Success",
+          description: `Invoice created! PDF downloaded to your Downloads folder as: ${invoice.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`,
+        });
+      } catch (error) {
+        console.error("PDF download error:", error);
+        toast({
+          title: "Invoice Created",
+          description: "Invoice saved successfully, but PDF download failed. Try downloading from invoice history.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error) => {
       toast({

@@ -67,9 +67,10 @@ export default function InvoiceGenerator() {
 
       generateInvoicePDF(previewInvoice);
       
+      const filename = `${invoiceData.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')}_Preview_${invoiceData.assessmentYear}.pdf`;
       toast({
-        title: "PDF Downloaded",
-        description: "Invoice preview has been downloaded successfully.",
+        title: "Preview Downloaded",
+        description: `Preview PDF downloaded to your Downloads folder as: ${filename}`,
       });
     } catch (error) {
       console.error("Error generating PDF:", error);

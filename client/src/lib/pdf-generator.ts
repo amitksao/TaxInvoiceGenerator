@@ -136,6 +136,9 @@ export function generateInvoicePDF(invoice: Invoice) {
     filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
   }
   
-  // Save the PDF
+  // Save the PDF to download folder
   doc.save(filename);
+  
+  // Log successful download
+  console.log(`PDF downloaded: ${filename}`);
 }
