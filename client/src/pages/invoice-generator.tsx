@@ -118,7 +118,26 @@ export default function InvoiceGenerator() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <InvoiceForm invoiceData={invoiceData} setInvoiceData={setInvoiceData} />
-          <InvoicePreview invoiceData={invoiceData} />
+          
+          {/* Preview Section with Download */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-primary" />
+                Invoice Preview
+              </h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadPreview}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Download Preview
+              </Button>
+            </div>
+            <InvoicePreview invoiceData={invoiceData} />
+          </div>
         </div>
       </div>
     </div>

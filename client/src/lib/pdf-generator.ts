@@ -129,7 +129,12 @@ export function generateInvoicePDF(invoice: Invoice) {
   
   // Generate filename with client name, invoice number, and assessment year
   const clientName = invoice.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
-  const filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
+  let filename;
+  if (invoice.invoiceNumber === "PREVIEW") {
+    filename = `${clientName}_Preview_${invoice.assessmentYear}.pdf`;
+  } else {
+    filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
+  }
   
   // Save the PDF
   doc.save(filename);

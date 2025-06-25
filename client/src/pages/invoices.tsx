@@ -169,7 +169,7 @@ export default function Invoices() {
                         className="mt-1"
                       >
                         <Download className="w-4 h-4 mr-1" />
-                        PDF
+                        Download PDF
                       </Button>
                     </div>
                   </div>

@@ -136,6 +136,7 @@ This is a full-stack web application built for generating professional tax invoi
 - June 24, 2025. Updated PDF naming convention to "ClientName_InvoiceNumber_AssessmentYear.pdf" for easy file organization
 - June 25, 2025. Implemented comprehensive admin authentication system with JWT tokens, password hashing, and protected routes
 - June 25, 2025. Resolved React Hook Form input field conflicts by implementing simplified authentication form with direct state management
+- June 25, 2025. Added comprehensive PDF download functionality: preview downloads from generator page, automatic downloads after invoice creation, and download buttons on invoice history
 
 ## User Preferences
 
