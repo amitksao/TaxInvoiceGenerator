@@ -14,7 +14,9 @@ interface AuthResponse {
 
 export function useAuth() {
   const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem('authToken');
+    const storedToken = localStorage.getItem('authToken');
+    console.log('Initial token from localStorage:', storedToken);
+    return storedToken;
   });
 
   const queryClient = useQueryClient();
