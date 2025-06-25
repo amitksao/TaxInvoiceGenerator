@@ -136,9 +136,24 @@ export function generateInvoicePDF(invoice: Invoice) {
     filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
   }
   
-  // Save the PDF to download folder
-  doc.save(filename);
-  
-  // Log successful download
-  console.log(`PDF downloaded: ${filename}`);
+  // Force download to local system
+  try {
+    // Use jsPDF's save method which triggers browser download
+    doc.save(filename);
+    console.log(`PDF download initiated: ${filename}`);
+  } catch (error) {
+    console.error('PDF save error:', error);
+    // Fallback: Create blob and trigger download manually
+    const pdfBlob = doc.output('blob');
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    console.log(`PDF download completed via fallback: ${filename}`);
+  }
 }

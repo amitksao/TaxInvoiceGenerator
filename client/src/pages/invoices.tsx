@@ -165,7 +165,11 @@ export default function Invoices() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDownloadPDF(invoice)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDownloadPDF(invoice);
+                        }}
                         className="mt-1"
                       >
                         <Download className="w-4 h-4 mr-1" />
