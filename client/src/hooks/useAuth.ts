@@ -104,33 +104,11 @@ export function useAuth() {
     window.location.reload();
   };
 
-  // Set up request interceptor for authenticated requests
+  // Handle token changes
   useEffect(() => {
     if (token) {
-      // Update the global query client to include auth header
-      queryClient.setDefaultOptions({
-        queries: {
-          queryFn: async ({ queryKey }) => {
-            const response = await fetch(queryKey[0] as string, {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-              },
-            });
-            
-            if (!response.ok) {
-              if (response.status === 401 || response.status === 403) {
-                logout();
-                throw new Error('Unauthorized');
-              }
-              throw new Error(`${response.status}: ${response.statusText}`);
-            }
-            
-            return response.json();
-          },
-        },
-      });
+      // Token is available - queries will use it via the global getQueryFn
+      queryClient.invalidateQueries();
     }
   }, [token, queryClient]);
 

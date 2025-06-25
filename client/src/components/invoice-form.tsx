@@ -45,7 +45,7 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
   const createInvoiceMutation = useMutation({
     mutationFn: async (data: CreateInvoice) => {
       const response = await apiRequest("POST", "/api/invoices", data);
-      return response.json();
+      return await response.json();
     },
     onSuccess: (invoice) => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
