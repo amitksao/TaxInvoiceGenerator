@@ -10,6 +10,7 @@ import InvoiceGenerator from "@/pages/invoice-generator";
 import Clients from "@/pages/clients";
 import Invoices from "@/pages/invoices";
 import Auth from "@/pages/auth";
+import AuthTest from "@/pages/auth-test";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,7 +29,8 @@ function Router() {
   }
 
   if (!isAuthenticated) {
-    return <Auth />;
+    // Temporarily use test auth page to debug input issues
+    return window.location.search.includes('test') ? <AuthTest /> : <Auth />;
   }
 
   return (

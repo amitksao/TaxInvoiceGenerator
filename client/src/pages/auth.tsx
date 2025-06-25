@@ -90,7 +90,12 @@ export default function Auth() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter username" {...field} />
+                          <Input 
+                            placeholder="Enter username" 
+                            autoComplete="username"
+                            autoFocus
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -103,7 +108,12 @@ export default function Auth() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Enter password" {...field} />
+                          <Input 
+                            type="password" 
+                            placeholder="Enter password" 
+                            autoComplete="current-password"
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -132,7 +142,11 @@ export default function Auth() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="Choose username (min 3 chars)" {...field} />
+                          <Input 
+                            placeholder="Choose username (min 3 chars)" 
+                            autoComplete="username"
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -145,7 +159,12 @@ export default function Auth() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Choose password (min 6 chars)" {...field} />
+                          <Input 
+                            type="password" 
+                            placeholder="Choose password (min 6 chars)" 
+                            autoComplete="new-password"
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
