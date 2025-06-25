@@ -12,7 +12,7 @@ export default function SimpleAuth() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { username, password, isLogin });
+
     
     if (!username.trim() || !password.trim()) {
       alert("Please fill in both fields");
@@ -72,19 +72,14 @@ export default function SimpleAuth() {
                   id="username"
                   type="text"
                   value={username}
-                  onChange={(e) => {
-                    console.log("Username changed:", e.target.value);
-                    setUsername(e.target.value);
-                  }}
-                  onInput={(e) => console.log("Username input:", e.currentTarget.value)}
-                  onKeyDown={(e) => console.log("Username keydown:", e.key)}
+                  onChange={(e) => setUsername(e.target.value)}
                   placeholder={isLogin ? "Enter username" : "Choose username"}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   autoFocus
                   autoComplete="username"
                   spellCheck={false}
                 />
-                <p className="text-xs text-gray-500 mt-1">Current value: "{username}"</p>
+
               </div>
 
               <div>
@@ -95,18 +90,13 @@ export default function SimpleAuth() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => {
-                    console.log("Password changed:", e.target.value);
-                    setPassword(e.target.value);
-                  }}
-                  onInput={(e) => console.log("Password input:", e.currentTarget.value)}
-                  onKeyDown={(e) => console.log("Password keydown:", e.key)}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder={isLogin ? "Enter password" : "Choose password"}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   autoComplete={isLogin ? "current-password" : "new-password"}
                   spellCheck={false}
                 />
-                <p className="text-xs text-gray-500 mt-1">Current value: "{password.replace(/./g, '*')}"</p>
+
               </div>
 
               {(loginError || registerError) && (
@@ -144,12 +134,7 @@ export default function SimpleAuth() {
               </button>
             </div>
 
-            <div className="mt-4 p-3 bg-gray-50 rounded text-xs">
-              <p>Debug Info:</p>
-              <p>Username: "{username}" (length: {username.length})</p>
-              <p>Password: "{password.replace(/./g, '*')}" (length: {password.length})</p>
-              <p>Mode: {isLogin ? "Login" : "Register"}</p>
-            </div>
+
           </CardContent>
         </Card>
 

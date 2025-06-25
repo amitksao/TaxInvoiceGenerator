@@ -30,10 +30,8 @@ function Router() {
   }
 
   if (!isAuthenticated) {
-    // Use simple auth page to debug input issues
-    if (window.location.search.includes('test')) return <AuthTest />;
-    if (window.location.search.includes('simple')) return <SimpleAuth />;
-    return <Auth />;
+    // Use simple auth page by default to avoid React Hook Form issues
+    return <SimpleAuth />;
   }
 
   return (

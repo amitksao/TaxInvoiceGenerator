@@ -51,7 +51,14 @@ export function useAuth() {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async ({ username, password }: { username: string; password: string }) => {
-      const response = await apiRequest('/api/auth/login', 'POST', { username, password });
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Login failed');
@@ -68,7 +75,14 @@ export function useAuth() {
   // Register mutation
   const registerMutation = useMutation({
     mutationFn: async ({ username, password }: { username: string; password: string }) => {
-      const response = await apiRequest('/api/auth/register', 'POST', { username, password });
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Registration failed');
@@ -98,7 +112,9 @@ export function useAuth() {
         queries: {
           queryFn: async ({ queryKey }) => {
             const response = await fetch(queryKey[0] as string, {
+              method: 'GET',
               headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
               },
             });
