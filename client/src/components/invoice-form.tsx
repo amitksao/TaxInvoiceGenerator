@@ -52,11 +52,23 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
       
       // Generate and download PDF to local download folder
       try {
+        const filename = `${invoice.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
+        
         generateInvoicePDF(invoice);
+        
         toast({
-          title: "Success",
-          description: `Invoice created! PDF downloaded to your Downloads folder as: ${invoice.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`,
+          title: "Invoice Created",
+          description: `Invoice saved and PDF downloaded to your Downloads folder as: ${filename}`,
         });
+        
+        // Show additional success message after brief delay
+        setTimeout(() => {
+          toast({
+            title: "PDF Ready",
+            description: `Check your Downloads folder for ${filename}`,
+          });
+        }, 1500);
+        
       } catch (error) {
         console.error("PDF download error:", error);
         toast({

@@ -48,16 +48,30 @@ export default function Invoices() {
     );
   });
 
-  const handleDownloadPDF = (invoice: Invoice) => {
+  const handleDownloadPDF = async (invoice: Invoice) => {
     try {
-      generateInvoicePDF(invoice);
       const clientName = invoice.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
       const filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
+      
+      // Generate PDF with proper user interaction context
+      generateInvoicePDF(invoice);
+      
+      // Show immediate feedback
       toast({
-        title: "PDF Downloaded",
-        description: `Downloaded as: ${filename}`,
+        title: "Downloading PDF",
+        description: `Saving ${filename} to your Downloads folder...`,
       });
+      
+      // Show success message after brief delay
+      setTimeout(() => {
+        toast({
+          title: "PDF Downloaded",
+          description: `${filename} has been saved to your Downloads folder`,
+        });
+      }, 1000);
+      
     } catch (error) {
+      console.error("PDF download error:", error);
       toast({
         title: "Download Failed",
         description: "Failed to generate PDF. Please try again.",

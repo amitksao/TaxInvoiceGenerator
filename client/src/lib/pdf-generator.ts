@@ -136,24 +136,86 @@ export function generateInvoicePDF(invoice: Invoice) {
     filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
   }
   
-  // Force download to local system
+  // Aggressive download approach - multiple simultaneous methods
+  console.log(`Attempting PDF download: ${filename}`);
+  
+  // Create blob first (most reliable)
+  const pdfBlob = doc.output('blob');
+  const blobUrl = URL.createObjectURL(pdfBlob);
+  
+  // Method 1: Native jsPDF save
   try {
-    // Use jsPDF's save method which triggers browser download
     doc.save(filename);
-    console.log(`PDF download initiated: ${filename}`);
-  } catch (error) {
-    console.error('PDF save error:', error);
-    // Fallback: Create blob and trigger download manually
-    const pdfBlob = doc.output('blob');
-    const url = URL.createObjectURL(pdfBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    console.log(`PDF download completed via fallback: ${filename}`);
+    console.log(`✓ jsPDF save attempted: ${filename}`);
+  } catch (e) {
+    console.warn('jsPDF save failed:', e);
   }
+  
+  // Method 2: Blob download with aggressive click simulation
+  const downloadLink = document.createElement('a');
+  downloadLink.href = blobUrl;
+  downloadLink.download = filename;
+  downloadLink.style.position = 'fixed';
+  downloadLink.style.top = '-1000px';
+  downloadLink.style.left = '-1000px';
+  
+  // Attach to DOM
+  document.body.appendChild(downloadLink);
+  
+  // Multiple click attempts
+  downloadLink.click();
+  
+  // Force click events
+  ['mousedown', 'mouseup', 'click'].forEach(eventType => {
+    const event = new MouseEvent(eventType, {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+      buttons: 1
+    });
+    downloadLink.dispatchEvent(event);
+  });
+  
+  console.log(`✓ Blob download attempted: ${filename}`);
+  
+  // Method 3: Data URI approach (immediate)
+  setTimeout(() => {
+    try {
+      const dataUri = doc.output('datauristring');
+      const dataLink = document.createElement('a');
+      dataLink.href = dataUri;
+      dataLink.download = filename;
+      document.body.appendChild(dataLink);
+      dataLink.click();
+      document.body.removeChild(dataLink);
+      console.log(`✓ Data URI download attempted: ${filename}`);
+    } catch (e) {
+      console.warn('Data URI download failed:', e);
+    }
+  }, 50);
+  
+  // Method 4: Window.open approach (last resort)
+  setTimeout(() => {
+    try {
+      const newWindow = window.open(blobUrl, '_blank');
+      if (newWindow) {
+        newWindow.document.title = filename;
+        console.log(`✓ Window.open attempted: ${filename}`);
+      }
+    } catch (e) {
+      console.warn('Window.open failed:', e);
+    }
+  }, 100);
+  
+  // Cleanup after delay
+  setTimeout(() => {
+    try {
+      document.body.removeChild(downloadLink);
+    } catch (e) {
+      // Link may already be removed
+    }
+    URL.revokeObjectURL(blobUrl);
+  }, 5000);
+  
+  console.log(`📄 PDF download process completed for: ${filename}`);
 }
