@@ -20,7 +20,7 @@ export function useAuth() {
   const queryClient = useQueryClient();
 
   // Get current user data
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading, refetch } = useQuery({
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
       if (!token) throw new Error('No token');
@@ -46,6 +46,8 @@ export function useAuth() {
     },
     enabled: !!token,
     retry: false,
+    staleTime: 0, // Always refetch when needed
+    gcTime: 0, // Don't cache
   });
 
   // Login mutation
@@ -65,10 +67,12 @@ export function useAuth() {
       }
       return response.json() as Promise<AuthResponse>;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       localStorage.setItem('authToken', data.token);
       setToken(data.token);
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      // Force immediate user data fetch and state update
+      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
     },
   });
 
@@ -89,10 +93,12 @@ export function useAuth() {
       }
       return response.json() as Promise<AuthResponse>;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       localStorage.setItem('authToken', data.token);
       setToken(data.token);
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      // Force immediate user data fetch and state update
+      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
     },
   });
 

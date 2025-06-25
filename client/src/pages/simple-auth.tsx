@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,12 +11,12 @@ export default function SimpleAuth() {
   const { login, register, loginError, registerError, isLoggingIn, isRegistering, isAuthenticated } = useAuth();
   
   // Clear form on successful authentication
-  useState(() => {
+  React.useEffect(() => {
     if (isAuthenticated) {
       setUsername("");
       setPassword("");
     }
-  });
+  }, [isAuthenticated]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
