@@ -67,12 +67,11 @@ export function useAuth() {
       }
       return response.json() as Promise<AuthResponse>;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       localStorage.setItem('authToken', data.token);
       setToken(data.token);
-      // Force immediate user data fetch and state update
-      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+      // Force page reload to enter application
+      window.location.reload();
     },
   });
 
@@ -93,12 +92,11 @@ export function useAuth() {
       }
       return response.json() as Promise<AuthResponse>;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       localStorage.setItem('authToken', data.token);
       setToken(data.token);
-      // Force immediate user data fetch and state update
-      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+      // Force page reload to enter application
+      window.location.reload();
     },
   });
 
