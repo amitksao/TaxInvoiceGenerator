@@ -11,6 +11,7 @@ import Clients from "@/pages/clients";
 import Invoices from "@/pages/invoices";
 import Auth from "@/pages/auth";
 import AuthTest from "@/pages/auth-test";
+import SimpleAuth from "@/pages/simple-auth";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -29,8 +30,10 @@ function Router() {
   }
 
   if (!isAuthenticated) {
-    // Temporarily use test auth page to debug input issues
-    return window.location.search.includes('test') ? <AuthTest /> : <Auth />;
+    // Use simple auth page to debug input issues
+    if (window.location.search.includes('test')) return <AuthTest />;
+    if (window.location.search.includes('simple')) return <SimpleAuth />;
+    return <Auth />;
   }
 
   return (

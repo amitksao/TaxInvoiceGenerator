@@ -24,7 +24,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false); // Start with register form
   const { login, register, loginError, registerError, isLoggingIn, isRegistering } = useAuth();
 
   const loginForm = useForm<LoginForm>({
