@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { Calculator, Calendar } from "lucide-react";
+import { Calculator, Calendar, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import InvoiceForm from "@/components/invoice-form";
 import InvoicePreview from "@/components/invoice-preview";
 import type { CreateInvoice } from "@shared/schema";
+import { generateInvoicePDF } from "@/lib/pdf-generator";
+import { useToast } from "@/hooks/use-toast";
 import logoImage from "@assets/8944800c-f7c0-4823-a996-e72890d14956_1750803319943.jpeg";
 
 export default function InvoiceGenerator() {
+  const { toast } = useToast();
   const [invoiceData, setInvoiceData] = useState<CreateInvoice>({
     assessmentYear: "",
     clientName: "",
@@ -24,6 +28,58 @@ export default function InvoiceGenerator() {
       { label: "", amount: 0 },
     ],
   });
+
+  const handleDownloadPreview = () => {
+    if (!invoiceData.clientName || !invoiceData.assessmentYear) {
+      toast({
+        title: "Incomplete Invoice",
+        description: "Please fill in client name and assessment year before downloading.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Convert form data to invoice format for PDF generation
+      const previewInvoice = {
+        id: 0,
+        invoiceNumber: "PREVIEW",
+        assessmentYear: invoiceData.assessmentYear,
+        clientName: invoiceData.clientName,
+        clientAddress: invoiceData.clientAddress,
+        clientCity: invoiceData.clientCity,
+        clientState: invoiceData.clientState,
+        clientPin: invoiceData.clientPin,
+        clientEmail: invoiceData.clientEmail,
+        clientPhone: invoiceData.clientPhone,
+        taxReturnCharges: parseFloat(invoiceData.taxReturnCharges) || 0,
+        accountingCharges: parseFloat(invoiceData.accountingCharges) || 0,
+        auditFee: parseFloat(invoiceData.auditFee) || 0,
+        additionalCharges: JSON.stringify(invoiceData.additionalCharges.filter(charge => charge.label && charge.amount > 0)),
+        totalAmount: (
+          (parseFloat(invoiceData.taxReturnCharges) || 0) +
+          (parseFloat(invoiceData.accountingCharges) || 0) +
+          (parseFloat(invoiceData.auditFee) || 0) +
+          invoiceData.additionalCharges.reduce((sum, charge) => sum + charge.amount, 0)
+        ).toString(),
+        createdAt: new Date().toISOString(),
+      };
+
+      generateInvoicePDF(previewInvoice);
+      
+      toast({
+        title: "PDF Downloaded",
+        description: "Invoice preview has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const currentDate = new Date().toLocaleDateString("en-US", {
     year: "numeric",
