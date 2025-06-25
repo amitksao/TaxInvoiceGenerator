@@ -8,7 +8,15 @@ export default function SimpleAuth() {
   const [isLogin, setIsLogin] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { login, register, loginError, registerError, isLoggingIn, isRegistering } = useAuth();
+  const { login, register, loginError, registerError, isLoggingIn, isRegistering, isAuthenticated } = useAuth();
+  
+  // Clear form on successful authentication
+  useState(() => {
+    if (isAuthenticated) {
+      setUsername("");
+      setPassword("");
+    }
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

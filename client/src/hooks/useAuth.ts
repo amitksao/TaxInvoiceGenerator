@@ -104,17 +104,18 @@ export function useAuth() {
     window.location.reload();
   };
 
-  // Handle token changes
+  // Handle token changes and force user data refetch
   useEffect(() => {
     if (token) {
-      // Token is available - queries will use it via the global getQueryFn
-      queryClient.invalidateQueries();
+      // Token is available - force immediate user data fetch
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
     }
   }, [token, queryClient]);
 
   return {
     user,
-    isLoading: isLoading && !!token,
+    isLoading: (isLoading && !!token) || loginMutation.isPending || registerMutation.isPending,
     isAuthenticated: !!user && !!token,
     login: loginMutation.mutate,
     register: registerMutation.mutate,
