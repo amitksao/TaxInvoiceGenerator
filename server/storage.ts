@@ -121,10 +121,14 @@ export class MemStorage implements IStorage {
   async createClient(insertClient: InsertClient): Promise<Client> {
     const id = this.currentClientId++;
     const client: Client = {
-      ...insertClient,
       id,
+      name: insertClient.name,
+      address: insertClient.address || null,
       email: insertClient.email || null,
       phone: insertClient.phone || null,
+      city: insertClient.city || null,
+      state: insertClient.state || null,
+      pin: insertClient.pin || null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -174,8 +178,8 @@ export class MemStorage implements IStorage {
       invoice.clientEmail?.toLowerCase().includes(lowerQuery) ||
       invoice.clientPhone?.includes(query) ||
       invoice.assessmentYear.includes(query) ||
-      invoice.clientCity.toLowerCase().includes(lowerQuery) ||
-      invoice.clientState.toLowerCase().includes(lowerQuery)
+      invoice.clientCity?.toLowerCase().includes(lowerQuery) ||
+      invoice.clientState?.toLowerCase().includes(lowerQuery)
     ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 

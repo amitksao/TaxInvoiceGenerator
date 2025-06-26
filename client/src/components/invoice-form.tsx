@@ -159,13 +159,16 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
       clientPhone: client.phone || "",
     };
 
-    // Update form values
+    // Update form values - convert null to undefined for form compatibility
     Object.entries(clientData).forEach(([key, value]) => {
-      form.setValue(key as keyof CreateInvoice, value);
+      form.setValue(key as keyof CreateInvoice, value || undefined);
     });
 
-    // Update invoice data state
-    setInvoiceData({ ...invoiceData, ...clientData });
+    // Update invoice data state - convert null to undefined for form compatibility  
+    const convertedClientData = Object.fromEntries(
+      Object.entries(clientData).map(([key, value]) => [key, value || undefined])
+    );
+    setInvoiceData({ ...invoiceData, ...convertedClientData });
     
     setIsClientSearchOpen(false);
     setClientSearchQuery("");

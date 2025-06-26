@@ -131,7 +131,17 @@ export default function Clients() {
 
   const handleEdit = (client: Client) => {
     setEditingClient(client);
-    form.reset(client);
+    // Convert null values to undefined for form compatibility
+    const clientData = {
+      name: client.name,
+      address: client.address || undefined,
+      email: client.email || undefined,
+      phone: client.phone || undefined,
+      city: client.city || undefined,
+      state: client.state || undefined,  
+      pin: client.pin || undefined,
+    };
+    form.reset(clientData);
   };
 
   const handleDelete = (id: number) => {

@@ -46,8 +46,8 @@ export default function Invoices() {
       invoice.clientEmail?.toLowerCase().includes(query) ||
       invoice.clientPhone?.includes(query) ||
       invoice.assessmentYear.includes(query) ||
-      invoice.clientCity.toLowerCase().includes(query) ||
-      invoice.clientState.toLowerCase().includes(query)
+      invoice.clientCity?.toLowerCase().includes(query) ||
+      invoice.clientState?.toLowerCase().includes(query)
     );
   });
 
