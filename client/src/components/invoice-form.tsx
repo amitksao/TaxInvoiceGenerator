@@ -211,6 +211,8 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem value="2025-26">2025-26</SelectItem>
+                      <SelectItem value="2024-25">2024-25</SelectItem>
                       <SelectItem value="2023-24">2023-24</SelectItem>
                       <SelectItem value="2022-23">2022-23</SelectItem>
                       <SelectItem value="2021-22">2021-22</SelectItem>
