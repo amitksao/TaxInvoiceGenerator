@@ -316,7 +316,7 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        Address <span className="text-red-500">*</span>
+                        Address
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -341,7 +341,7 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        City <span className="text-red-500">*</span>
+                        City
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -364,7 +364,7 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        State <span className="text-red-500">*</span>
+                        State
                       </FormLabel>
                       <FormControl>
                         <Input

@@ -259,7 +259,7 @@ export default function Clients() {
                     name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Address *</FormLabel>
+                        <FormLabel>Address</FormLabel>
                         <FormControl>
                           <Input placeholder="Full address" {...field} />
                         </FormControl>
@@ -274,7 +274,7 @@ export default function Clients() {
                       name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>City *</FormLabel>
+                          <FormLabel>City</FormLabel>
                           <FormControl>
                             <Input placeholder="City" {...field} />
                           </FormControl>
@@ -288,7 +288,7 @@ export default function Clients() {
                       name="state"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>State *</FormLabel>
+                          <FormLabel>State</FormLabel>
                           <FormControl>
                             <Input placeholder="State" {...field} />
                           </FormControl>
@@ -302,7 +302,7 @@ export default function Clients() {
                       name="pin"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>PIN Code *</FormLabel>
+                          <FormLabel>PIN Code</FormLabel>
                           <FormControl>
                             <Input placeholder="PIN Code" {...field} />
                           </FormControl>

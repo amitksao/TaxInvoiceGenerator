@@ -47,7 +47,18 @@ export const insertInvoiceSchema = createInsertSchema(invoices, {
 });
 
 export const createInvoiceSchema = insertInvoiceSchema.extend({
-  additionalCharges: z.array(additionalChargeSchema).max(3),
+  clientName: z.string().min(1, "Client name is required"),
+  clientEmail: z.string().email("Invalid email format").optional(),
+  clientPhone: z.string().min(10, "Phone number must be at least 10 digits").optional(),
+  clientAddress: z.string().optional(),
+  clientCity: z.string().optional(),
+  clientState: z.string().optional(),
+  clientPin: z.string().min(6, "PIN must be 6 digits").max(6, "PIN must be 6 digits").optional(),
+  assessmentYear: z.string().min(1, "Assessment year is required"),
+  taxReturnCharges: z.string().min(1, "Tax return charges are required"),
+  accountingCharges: z.string().optional(),
+  auditFee: z.string().optional(),
+  additionalCharges: z.array(additionalChargeSchema).max(3).default([]),
 });
 
 export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
@@ -95,10 +106,10 @@ export const insertClientSchema = createInsertSchema(clients, {
   name: z.string().min(1, "Client name is required"),
   email: z.string().email("Invalid email format").optional(),
   phone: z.string().optional(),
-  address: z.string().min(1, "Address is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State is required"),
-  pin: z.string().min(1, "PIN code is required"),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  pin: z.string().min(6, "PIN must be 6 digits").max(6, "PIN must be 6 digits").optional(),
 }).omit({
   id: true,
   createdAt: true,
