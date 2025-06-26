@@ -51,11 +51,22 @@ export function generateInvoicePDF(invoice: Invoice) {
   doc.text('Bill To:', 20, 140);
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
-  doc.text(invoice.clientName, 20, 150);
-  doc.text(invoice.clientAddress, 20, 158);
-  doc.text(`${invoice.clientCity}, ${invoice.clientState}, ${invoice.clientPin}`, 20, 166);
   
-  let clientInfoY = 174;
+  let clientInfoY = 150;
+  doc.text(invoice.clientName, 20, clientInfoY);
+  clientInfoY += 8;
+  
+  if (invoice.clientAddress) {
+    doc.text(invoice.clientAddress, 20, clientInfoY);
+    clientInfoY += 8;
+  }
+  
+  const locationParts = [invoice.clientCity, invoice.clientState, invoice.clientPin].filter(Boolean);
+  if (locationParts.length > 0) {
+    doc.text(locationParts.join(', '), 20, clientInfoY);
+    clientInfoY += 8;
+  }
+  
   if (invoice.clientEmail) {
     doc.text(`Email: ${invoice.clientEmail}`, 20, clientInfoY);
     clientInfoY += 8;
