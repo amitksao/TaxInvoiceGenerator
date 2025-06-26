@@ -88,7 +88,7 @@ export default function InvoicePreview({ invoiceData }: InvoicePreviewProps) {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Dipak Kumar Sao & Associates</h2>
             <p className="text-lg text-gray-700 mb-1">(Advocate & Tax Consultant)</p>
-            <p className="text-sm text-gray-600 mb-1">Northlake Road, Besides Manas Sarovar, Po. & Dist. Purulia.</p>
+            <p className="text-sm text-gray-600 mb-1">North Lake Road, Besides Manas Sarovar, Po. & Dist. Purulia.</p>
             <p className="text-sm text-gray-600 mb-1">Mobile - 9778780582/9434001881</p>
             <p className="text-sm text-gray-600">E-Mail : dipakadv.sao@gmail.com</p>
           </div>
