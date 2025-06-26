@@ -9,53 +9,53 @@ export function generateInvoicePDF(invoice: Invoice) {
   // Set font
   doc.setFont('helvetica', 'normal');
   
-  // Add logo centered
+  // Add logo centered - increased size
   try {
-    doc.addImage(logoImage, 'JPEG', 95, 15, 20, 20);
+    doc.addImage(logoImage, 'JPEG', 90, 12, 30, 30);
   } catch (error) {
     console.warn('Could not add logo to PDF:', error);
   }
   
-  // Company header - centered
-  doc.setFontSize(16);
+  // Company header - centered with larger fonts
+  doc.setFontSize(20);
   doc.setTextColor(0, 0, 0);
-  doc.text('Dipak Kumar Sao & Associates', 105, 45, { align: 'center' });
+  doc.text('Dipak Kumar Sao & Associates', 105, 48, { align: 'center' });
   
-  doc.setFontSize(12);
+  doc.setFontSize(14);
   doc.setTextColor(0, 0, 0);
-  doc.text('(Advocate & Tax Consultant)', 105, 52, { align: 'center' });
+  doc.text('(Advocate & Tax Consultant)', 105, 58, { align: 'center' });
   
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setTextColor(100, 100, 100);
-  doc.text('Northlake Road, Besides Manas Sarovar, Po. & Dist. Purulia.', 105, 59, { align: 'center' });
-  doc.text('Mobile - 9778780582/9434001881', 105, 66, { align: 'center' });
-  doc.text('E-Mail : dipakadv.sao@gmail.com', 105, 73, { align: 'center' });
+  doc.text('North Lake Road, Besides Manas Sarovar, Po. & Dist. Purulia.', 105, 68, { align: 'center' });
+  doc.text('Mobile - 9778780582/9434001881', 105, 78, { align: 'center' });
+  doc.text('E-Mail : dipakadv.sao@gmail.com', 105, 88, { align: 'center' });
   
   // Separator line
-  doc.line(20, 80, 190, 80);
+  doc.line(20, 95, 190, 95);
   
   // Invoice header
   doc.setFontSize(20);
   doc.setTextColor(25, 118, 210); // Primary blue color
-  doc.text('INVOICE', 20, 95);
+  doc.text('INVOICE', 20, 110);
   
   // Invoice details
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
-  doc.text(`Invoice #: ${invoice.invoiceNumber}`, 150, 95);
-  doc.text(`Date: ${new Date(invoice.createdAt).toLocaleDateString()}`, 150, 103);
-  doc.text(`Assessment Year: ${invoice.assessmentYear}`, 150, 111);
+  doc.text(`Invoice #: ${invoice.invoiceNumber}`, 150, 110);
+  doc.text(`Date: ${new Date(invoice.createdAt).toLocaleDateString()}`, 150, 118);
+  doc.text(`Assessment Year: ${invoice.assessmentYear}`, 150, 126);
   
   // Client info
   doc.setFontSize(12);
-  doc.text('Bill To:', 20, 125);
+  doc.text('Bill To:', 20, 140);
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
-  doc.text(invoice.clientName, 20, 135);
-  doc.text(invoice.clientAddress, 20, 143);
-  doc.text(`${invoice.clientCity}, ${invoice.clientState}, ${invoice.clientPin}`, 20, 151);
+  doc.text(invoice.clientName, 20, 150);
+  doc.text(invoice.clientAddress, 20, 158);
+  doc.text(`${invoice.clientCity}, ${invoice.clientState}, ${invoice.clientPin}`, 20, 166);
   
-  let clientInfoY = 159;
+  let clientInfoY = 174;
   if (invoice.clientEmail) {
     doc.text(`Email: ${invoice.clientEmail}`, 20, clientInfoY);
     clientInfoY += 8;
@@ -66,7 +66,7 @@ export function generateInvoicePDF(invoice: Invoice) {
   }
   
   // Services table header
-  let yPosition = Math.max(170, clientInfoY + 10);
+  let yPosition = Math.max(185, clientInfoY + 10);
   doc.setFontSize(12);
   doc.setTextColor(0, 0, 0);
   doc.text('Description', 20, yPosition);
