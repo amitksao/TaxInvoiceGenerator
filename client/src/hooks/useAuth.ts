@@ -14,7 +14,7 @@ interface AuthResponse {
 
 export function useAuth() {
   const [token, setToken] = useState<string | null>(() => {
-    const storedToken = localStorage.getItem('token');
+    const storedToken = localStorage.getItem('authToken');
     console.log('Initial token from localStorage:', storedToken);
     return storedToken;
   });
@@ -36,7 +36,7 @@ export function useAuth() {
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
           // Token is invalid, clear it
-          localStorage.removeItem('token');
+          localStorage.removeItem('authToken');
           setToken(null);
           throw new Error('Unauthorized');
         }
@@ -104,7 +104,7 @@ export function useAuth() {
 
   // Logout function
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     setToken(null);
     queryClient.clear();
     window.location.reload();
