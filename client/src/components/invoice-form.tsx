@@ -387,7 +387,7 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        PIN <span className="text-red-500">*</span>
+                        PIN
                       </FormLabel>
                       <FormControl>
                         <Input
