@@ -14,6 +14,7 @@ import type { Invoice } from "@shared/schema";
 export default function Invoices() {
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Check for client filter from URL
   const urlParams = new URLSearchParams(window.location.search);

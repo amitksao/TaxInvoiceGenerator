@@ -23,6 +23,7 @@ export interface IStorage {
   getInvoices(): Promise<Invoice[]>;
   searchInvoices(query: string): Promise<Invoice[]>;
   getInvoicesByClient(clientId: number): Promise<Invoice[]>;
+  deleteInvoice(id: number): Promise<boolean>;
   
   createClient(client: InsertClient): Promise<Client>;
   getClient(id: number): Promise<Client | undefined>;
