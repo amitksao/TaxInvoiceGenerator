@@ -31,8 +31,9 @@ export default function Invoices() {
   // Fetch invoices
   const { data: invoices, isLoading } = useQuery({
     queryKey: ["/api/invoices"],
-    queryFn: getQueryFn({ on401: "throw" }),
+    queryFn: getQueryFn({ on401: "returnNull" }),
     select: (data) => data as Invoice[],
+    enabled: true,
   });
 
   // Filter invoices based on search query
