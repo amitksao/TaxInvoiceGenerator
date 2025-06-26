@@ -11,7 +11,7 @@ export function generateInvoicePDF(invoice: Invoice) {
   
   // Add logo centered - increased size
   try {
-    doc.addImage(logoImage, 'JPEG', 90, 12, 30, 30);
+    doc.addImage(logoImage, 'JPEG', 85, 10, 40, 40);
   } catch (error) {
     console.warn('Could not add logo to PDF:', error);
   }

@@ -78,7 +78,7 @@ export default function InvoicePreview({ invoiceData }: InvoicePreviewProps) {
           {/* Company Header */}
           <div className="text-center mb-8 border-b-2 border-gray-200 pb-6">
             <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 rounded-lg overflow-hidden">
+              <div className="w-28 h-28 rounded-lg overflow-hidden">
                 <img 
                   src={logoImage} 
                   alt="Company Logo" 
