@@ -189,6 +189,10 @@ export class MemStorage implements IStorage {
       invoice.clientPhone === client.phone
     ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
+
+  async deleteInvoice(id: number): Promise<boolean> {
+    return this.invoices.delete(id);
+  }
 }
 
 // Database Storage Implementation
@@ -325,6 +329,11 @@ export class DatabaseStorage implements IStorage {
         ilike(invoices.clientName, client.name)
       )
       .orderBy(desc(invoices.createdAt));
+  }
+
+  async deleteInvoice(id: number): Promise<boolean> {
+    const result = await db.delete(invoices).where(eq(invoices.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 }
 

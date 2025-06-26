@@ -121,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single invoice
-  app.get("/api/invoices/:id", async (req, res) => {
+  app.get("/api/invoices/:id", authenticateToken, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -136,6 +136,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(invoice);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch invoice" });
+    }
+  });
+
+  // Delete invoice
+  app.delete("/api/invoices/:id", authenticateToken, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid invoice ID" });
+      }
+
+      const success = await storage.deleteInvoice(id);
+      if (!success) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      res.json({ message: "Invoice deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      res.status(500).json({ message: "Failed to delete invoice" });
     }
   });
 

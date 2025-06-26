@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Search, FileText, Download, Calendar, User, Eye } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Search, FileText, Download, Calendar, User, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { getQueryFn } from "@/lib/queryClient";
+import { getQueryFn, apiRequest } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/currency";
 import { generateInvoicePDF } from "@/lib/pdf-generator";
 import type { Invoice } from "@shared/schema";
@@ -48,6 +49,31 @@ export default function Invoices() {
       invoice.clientState.toLowerCase().includes(query)
     );
   });
+
+  const deleteInvoiceMutation = useMutation({
+    mutationFn: async (invoiceId: number) => {
+      await apiRequest(`/api/invoices/${invoiceId}`, "DELETE");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      toast({
+        title: "Invoice Deleted",
+        description: "The invoice has been successfully deleted.",
+      });
+    },
+    onError: (error) => {
+      console.error("Delete invoice error:", error);
+      toast({
+        title: "Delete Failed",
+        description: "There was an error deleting the invoice. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteInvoice = (invoiceId: number) => {
+    deleteInvoiceMutation.mutate(invoiceId);
+  };
 
   const handleDownloadPDF = async (invoice: Invoice) => {
     try {
@@ -177,19 +203,52 @@ export default function Invoices() {
                       <div className="text-lg font-semibold text-green-600">
                         {formatCurrency(parseFloat(invoice.totalAmount))}
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleDownloadPDF(invoice);
-                        }}
-                        className="mt-1"
-                      >
-                        <Download className="w-4 h-4 mr-1" />
-                        Download PDF
-                      </Button>
+                      <div className="flex gap-2 mt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDownloadPDF(invoice);
+                          }}
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          Download PDF
+                        </Button>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Invoice</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete invoice {invoice.invoiceNumber}? 
+                                This action cannot be undone and will permanently remove the invoice data.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteInvoice(invoice.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                                disabled={deleteInvoiceMutation.isPending}
+                              >
+                                {deleteInvoiceMutation.isPending ? "Deleting..." : "Delete Invoice"}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
                   </div>
                 </CardHeader>
