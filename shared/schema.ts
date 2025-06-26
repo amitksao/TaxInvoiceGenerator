@@ -29,9 +29,9 @@ export const additionalChargeSchema = z.object({
 export const insertInvoiceSchema = createInsertSchema(invoices, {
   assessmentYear: z.string().min(1, "Assessment year is required"),
   clientName: z.string().min(1, "Client name is required"),
-  clientAddress: z.string().min(1, "Client address is required"),
-  clientCity: z.string().min(1, "City is required"),
-  clientState: z.string().min(1, "State is required"),
+  clientAddress: z.string().optional(),
+  clientCity: z.string().optional(),
+  clientState: z.string().optional(),
   clientPin: z.string().refine((val) => !val || (val.length === 6 && /^\d+$/.test(val)), "PIN must be 6 digits").optional(),
   clientEmail: z.string().email("Invalid email format").optional(),
   clientPhone: z.string().refine((val) => !val || val.length >= 10, "Phone number must be at least 10 digits").optional(),
@@ -105,11 +105,11 @@ export const clients = pgTable("clients", {
 export const insertClientSchema = createInsertSchema(clients, {
   name: z.string().min(1, "Client name is required"),
   email: z.string().email("Invalid email format").optional(),
-  phone: z.string().optional(),
+  phone: z.string().refine((val) => !val || val.length >= 10, "Phone number must be at least 10 digits").optional(),
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
-  pin: z.string().refine((val) => !val || (val.length === 6 && /^\d+$/.test(val)), "PIN must be 6 digits").optional(),
+  pin: z.string().optional().refine((val) => !val || val === "" || (val.length === 6 && /^\d+$/.test(val)), "PIN must be 6 digits when provided"),
 }).omit({
   id: true,
   createdAt: true,
