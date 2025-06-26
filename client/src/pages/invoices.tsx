@@ -52,7 +52,7 @@ export default function Invoices() {
 
   const deleteInvoiceMutation = useMutation({
     mutationFn: async (invoiceId: number) => {
-      await apiRequest(`/api/invoices/${invoiceId}`, "DELETE");
+      await apiRequest("DELETE", `/api/invoices/${invoiceId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
