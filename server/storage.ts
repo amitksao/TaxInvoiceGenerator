@@ -224,42 +224,47 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createInvoice(insertInvoice: InsertInvoice): Promise<Invoice> {
-    // Generate invoice number
-    const currentYear = new Date().getFullYear();
-    const existingInvoices = await db.select().from(invoices);
-    const invoiceNumber = `INV-${currentYear}-${String(existingInvoices.length + 1).padStart(3, '0')}`;
-    
-    // Calculate total amount
-    const taxReturn = parseFloat(insertInvoice.taxReturnCharges);
-    const accounting = parseFloat(insertInvoice.accountingCharges || "0");
-    const audit = parseFloat(insertInvoice.auditFee || "0");
-    
-    const additionalCharges = JSON.parse(insertInvoice.additionalCharges);
-    const additionalTotal = additionalCharges.reduce((sum: number, charge: any) => sum + (charge.amount || 0), 0);
-    
-    const totalAmount = (taxReturn + accounting + audit + additionalTotal).toFixed(2);
-    
-    const [invoice] = await db
-      .insert(invoices)
-      .values({
-        invoiceNumber,
-        assessmentYear: insertInvoice.assessmentYear,
-        clientName: insertInvoice.clientName,
-        clientAddress: insertInvoice.clientAddress || null,
-        clientCity: insertInvoice.clientCity || null,
-        clientState: insertInvoice.clientState || null,
-        clientPin: insertInvoice.clientPin || null,
-        clientEmail: insertInvoice.clientEmail || null,
-        clientPhone: insertInvoice.clientPhone || null,
-        taxReturnCharges: insertInvoice.taxReturnCharges,
-        accountingCharges: insertInvoice.accountingCharges || null,
-        auditFee: insertInvoice.auditFee || null,
-        additionalCharges: insertInvoice.additionalCharges,
-        totalAmount,
-      })
-      .returning();
-    
-    return invoice;
+    try {
+      // Generate invoice number
+      const currentYear = new Date().getFullYear();
+      const existingInvoices = await db.select().from(invoices);
+      const invoiceNumber = `INV-${currentYear}-${String(existingInvoices.length + 1).padStart(3, '0')}`;
+      
+      // Calculate total amount
+      const taxReturn = parseFloat(insertInvoice.taxReturnCharges);
+      const accounting = parseFloat(insertInvoice.accountingCharges || "0");
+      const audit = parseFloat(insertInvoice.auditFee || "0");
+      
+      const additionalCharges = JSON.parse(insertInvoice.additionalCharges);
+      const additionalTotal = additionalCharges.reduce((sum: number, charge: any) => sum + (charge.amount || 0), 0);
+      
+      const totalAmount = (taxReturn + accounting + audit + additionalTotal).toFixed(2);
+      
+      const [invoice] = await db
+        .insert(invoices)
+        .values({
+          invoiceNumber,
+          assessmentYear: insertInvoice.assessmentYear,
+          clientName: insertInvoice.clientName,
+          clientAddress: insertInvoice.clientAddress || null,
+          clientCity: insertInvoice.clientCity || null,
+          clientState: insertInvoice.clientState || null,
+          clientPin: insertInvoice.clientPin || null,
+          clientEmail: insertInvoice.clientEmail || null,
+          clientPhone: insertInvoice.clientPhone || null,
+          taxReturnCharges: insertInvoice.taxReturnCharges,
+          accountingCharges: insertInvoice.accountingCharges || "0",
+          auditFee: insertInvoice.auditFee || "0",
+          additionalCharges: insertInvoice.additionalCharges,
+          totalAmount,
+        })
+        .returning();
+      
+      return invoice;
+    } catch (error) {
+      console.error('Database error in createInvoice:', error);
+      throw error;
+    }
   }
 
   async getInvoice(id: number): Promise<Invoice | undefined> {

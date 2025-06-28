@@ -74,6 +74,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const invoice = await storage.createInvoice(invoiceData);
       res.json(invoice);
     } catch (error) {
+      console.error('Invoice creation error:', error);
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: fromZodError(error).toString() });
       } else {
