@@ -142,23 +142,36 @@ export function generateInvoicePDF(invoice: Invoice) {
   doc.text('Total Amount:', 120, yPosition);
   doc.text(formatCurrencyForPDF(parseFloat(invoice.totalAmount)), 150, yPosition);
   
-  // Signature section
-  yPosition += 40;
+  // Signature section - ensure it stays within page boundaries
+  yPosition += 30;
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
   
-  // Signature box with better styling
-  doc.rect(130, yPosition, 60, 40);
-  doc.text('Authorized Signatory:', 132, yPosition - 5);
-  doc.text('Signature:', 132, yPosition + 15);
-  doc.text('Date: _______________', 132, yPosition + 30);
+  // Check if signature box would fit on current page, if not, add new page
+  const signatureBoxHeight = 40;
+  const pageHeight = 297; // A4 height in mm
+  const bottomMargin = 20;
+  
+  if (yPosition + signatureBoxHeight > pageHeight - bottomMargin) {
+    doc.addPage();
+    yPosition = 20; // Start from top of new page
+  }
+  
+  // Signature box with better styling - positioned within page margins
+  const signatureBoxX = 120; // Move left to fit within page
+  const signatureBoxWidth = 65; // Adjust width to fit within margins
+  
+  doc.rect(signatureBoxX, yPosition, signatureBoxWidth, signatureBoxHeight);
+  doc.text('Authorized Signatory:', signatureBoxX + 2, yPosition - 5);
+  doc.text('Signature:', signatureBoxX + 2, yPosition + 15);
+  doc.text('Date: _______________', signatureBoxX + 2, yPosition + 30);
   
   // Company name below signature box
   doc.setFontSize(9);
   doc.setTextColor(50, 50, 50);
-  doc.text('Dipak Kumar Sao & Associates', 132, yPosition + 50);
+  doc.text('Dipak Kumar Sao & Associates', signatureBoxX + 2, yPosition + 50);
   
-  // Footer
+  // Footer - ensure it's positioned properly
   yPosition += 60;
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);

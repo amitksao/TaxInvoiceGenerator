@@ -142,6 +142,9 @@ This is a full-stack web application built for generating professional tax invoi
 - June 25, 2025. Fixed authentication state synchronization issue by forcing page reload after successful login to ensure proper UI updates
 - June 26, 2025. Created comprehensive end-to-end test automation plan covering authentication, client management, invoice generation, security, performance, and cross-browser testing
 - June 26, 2025. Implemented complete Playwright test automation suite with 25+ test scenarios, cross-browser compatibility, mobile responsiveness, performance testing, security validation, and reusable test utilities
+- January 7, 2025. Fixed database connection issues by switching from WebSocket to HTTP connection for better stability
+- January 7, 2025. Resolved PDF currency formatting issues by replacing Unicode Rupee symbol with "Rs." to avoid jsPDF rendering problems
+- January 7, 2025. Fixed signature box positioning in PDF invoices to ensure it stays within page boundaries with proper margins and page break handling
 
 ## User Preferences
 
