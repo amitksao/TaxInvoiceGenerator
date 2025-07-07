@@ -131,16 +131,21 @@ export function generateInvoicePDF(invoice: Invoice) {
   doc.text('Total Amount:', 120, yPosition);
   doc.text(formatCurrency(parseFloat(invoice.totalAmount)), 150, yPosition);
   
-  // Signature box
+  // Signature section
   yPosition += 40;
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
   
-  // Draw signature box
-  doc.rect(130, yPosition, 60, 30);
-  doc.text('Signature:', 132, yPosition + 10);
-  doc.text('Date:', 132, yPosition + 20);
-  doc.text('Dipak Kumar Sao & Associates', 132, yPosition + 45);
+  // Signature box with better styling
+  doc.rect(130, yPosition, 60, 40);
+  doc.text('Authorized Signatory:', 132, yPosition - 5);
+  doc.text('Signature:', 132, yPosition + 15);
+  doc.text('Date: _______________', 132, yPosition + 30);
+  
+  // Company name below signature box
+  doc.setFontSize(9);
+  doc.setTextColor(50, 50, 50);
+  doc.text('Dipak Kumar Sao & Associates', 132, yPosition + 50);
   
   // Footer
   yPosition += 60;
