@@ -228,7 +228,19 @@ export class DatabaseStorage implements IStorage {
       // Generate invoice number
       const currentYear = new Date().getFullYear();
       const existingInvoices = await db.select().from(invoices);
-      const invoiceNumber = `INV-${currentYear}-${String(existingInvoices.length + 1).padStart(3, '0')}`;
+      
+      // Find the highest existing invoice number for this year
+      const yearPrefix = `INV-${currentYear}-`;
+      const existingNumbers = existingInvoices
+        .filter(inv => inv.invoiceNumber.startsWith(yearPrefix))
+        .map(inv => {
+          const numberPart = inv.invoiceNumber.replace(yearPrefix, '');
+          return parseInt(numberPart, 10) || 0;
+        })
+        .sort((a, b) => b - a);
+      
+      const nextNumber = existingNumbers.length > 0 ? existingNumbers[0] + 1 : 1;
+      const invoiceNumber = `INV-${currentYear}-${String(nextNumber).padStart(3, '0')}`;
       
       // Calculate total amount
       const taxReturn = parseFloat(insertInvoice.taxReturnCharges);
