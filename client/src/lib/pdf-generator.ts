@@ -6,8 +6,17 @@ import logoImage from "@assets/8944800c-f7c0-4823-a996-e72890d14956_175080331994
 export function generateInvoicePDF(invoice: Invoice) {
   const doc = new jsPDF();
   
-  // Set font
+  // Set font - use unicode support for currency symbols
   doc.setFont('helvetica', 'normal');
+  
+  // Test currency symbol support
+  console.log('Testing currency symbol in PDF:', formatCurrency(100));
+  
+  // Define a custom currency formatter for PDF that ensures proper rendering
+  const formatCurrencyForPDF = (amount: number): string => {
+    // Use proper Indian Rupee symbol (₹) instead of generic Rs.
+    return `₹ ${amount.toFixed(2)}`;
+  };
   
   // Add logo centered - increased size
   try {
@@ -94,21 +103,21 @@ export function generateInvoicePDF(invoice: Invoice) {
   // Tax return charges
   if (parseFloat(invoice.taxReturnCharges) > 0) {
     doc.text('Tax Return Filing', 20, yPosition);
-    doc.text(formatCurrency(parseFloat(invoice.taxReturnCharges)), 150, yPosition);
+    doc.text(formatCurrencyForPDF(parseFloat(invoice.taxReturnCharges)), 150, yPosition);
     yPosition += 10;
   }
   
   // Accounting charges
   if (parseFloat(invoice.accountingCharges || '0') > 0) {
     doc.text('Accounting Services', 20, yPosition);
-    doc.text(formatCurrency(parseFloat(invoice.accountingCharges!)), 150, yPosition);
+    doc.text(formatCurrencyForPDF(parseFloat(invoice.accountingCharges!)), 150, yPosition);
     yPosition += 10;
   }
   
   // Audit fee
   if (parseFloat(invoice.auditFee || '0') > 0) {
     doc.text('Audit Services', 20, yPosition);
-    doc.text(formatCurrency(parseFloat(invoice.auditFee!)), 150, yPosition);
+    doc.text(formatCurrencyForPDF(parseFloat(invoice.auditFee!)), 150, yPosition);
     yPosition += 10;
   }
   
@@ -116,7 +125,7 @@ export function generateInvoicePDF(invoice: Invoice) {
   additionalCharges.forEach((charge: any) => {
     if (charge.label && charge.amount > 0) {
       doc.text(charge.label, 20, yPosition);
-      doc.text(formatCurrency(charge.amount), 150, yPosition);
+      doc.text(formatCurrencyForPDF(charge.amount), 150, yPosition);
       yPosition += 10;
     }
   });
@@ -129,7 +138,7 @@ export function generateInvoicePDF(invoice: Invoice) {
   doc.setFontSize(12);
   doc.setTextColor(25, 118, 210);
   doc.text('Total Amount:', 120, yPosition);
-  doc.text(formatCurrency(parseFloat(invoice.totalAmount)), 150, yPosition);
+  doc.text(formatCurrencyForPDF(parseFloat(invoice.totalAmount)), 150, yPosition);
   
   // Signature section
   yPosition += 40;
