@@ -33,7 +33,7 @@ export const insertInvoiceSchema = createInsertSchema(invoices, {
   clientCity: z.string().optional(),
   clientState: z.string().optional(),
   clientPin: z.string().optional(),
-  clientEmail: z.string().email("Invalid email format").optional(),
+  clientEmail: z.string().refine((val) => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), "Invalid email format").optional(),
   clientPhone: z.string().refine((val) => !val || val.length >= 10, "Phone number must be at least 10 digits").optional(),
   taxReturnCharges: z.string().min(1, "Tax return charges are required"),
   accountingCharges: z.string().optional(),
@@ -48,7 +48,7 @@ export const insertInvoiceSchema = createInsertSchema(invoices, {
 
 export const createInvoiceSchema = insertInvoiceSchema.extend({
   clientName: z.string().min(1, "Client name is required"),
-  clientEmail: z.string().email("Invalid email format").optional(),
+  clientEmail: z.string().refine((val) => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), "Invalid email format").optional(),
   clientPhone: z.string().refine((val) => !val || val.length >= 10, "Phone number must be at least 10 digits").optional(),
   clientAddress: z.string().optional(),
   clientCity: z.string().optional(),
