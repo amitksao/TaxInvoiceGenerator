@@ -235,7 +235,15 @@ export class DatabaseStorage implements IStorage {
       const accounting = parseFloat(insertInvoice.accountingCharges || "0");
       const audit = parseFloat(insertInvoice.auditFee || "0");
       
-      const additionalCharges = JSON.parse(insertInvoice.additionalCharges);
+      let additionalCharges = [];
+      try {
+        additionalCharges = typeof insertInvoice.additionalCharges === 'string' 
+          ? JSON.parse(insertInvoice.additionalCharges) 
+          : insertInvoice.additionalCharges || [];
+      } catch (error) {
+        console.error('Error parsing additional charges:', error);
+        additionalCharges = [];
+      }
       const additionalTotal = additionalCharges.reduce((sum: number, charge: any) => sum + (charge.amount || 0), 0);
       
       const totalAmount = (taxReturn + accounting + audit + additionalTotal).toFixed(2);

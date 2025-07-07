@@ -68,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         taxReturnCharges: parsed.taxReturnCharges,
         accountingCharges: parsed.accountingCharges || "0",
         auditFee: parsed.auditFee || "0",
-        additionalCharges: JSON.stringify(parsed.additionalCharges),
+        additionalCharges: JSON.stringify(parsed.additionalCharges || []),
       };
       
       const invoice = await storage.createInvoice(invoiceData);
