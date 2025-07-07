@@ -1,10 +1,7 @@
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-  }).format(amount);
+  return `Rs ${amount.toFixed(2)}`;
 }
 
 export function formatCurrencyShort(amount: number): string {
-  return `₹${amount.toFixed(2)}`;
+  return `Rs ${amount.toFixed(2)}`;
 }
