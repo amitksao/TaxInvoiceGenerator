@@ -4,18 +4,20 @@ import { formatCurrency } from './currency';
 import logoImage from "@assets/8944800c-f7c0-4823-a996-e72890d14956_1750803319943.jpeg";
 
 export function generateInvoicePDF(invoice: Invoice) {
-  const doc = new jsPDF();
-  
-  // Set font - use unicode support for currency symbols
-  doc.setFont('helvetica', 'normal');
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+    compress: true
+  });
   
   // Test currency symbol support
   console.log('Testing currency symbol in PDF:', formatCurrency(100));
   
   // Define a custom currency formatter for PDF that ensures proper rendering
   const formatCurrencyForPDF = (amount: number): string => {
-    // Use proper Indian Rupee symbol (₹) instead of generic Rs.
-    return `₹ ${amount.toFixed(2)}`;
+    // Use the text "Rupees" to avoid Unicode issues entirely
+    return `Rs. ${amount.toFixed(2)}`;
   };
   
   // Add logo centered - increased size
