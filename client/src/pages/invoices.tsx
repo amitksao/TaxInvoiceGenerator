@@ -99,7 +99,7 @@ export default function Invoices() {
     sessionStorage.setItem('editInvoiceData', JSON.stringify(editData));
     
     // Navigate to invoice generator
-    window.location.href = '/invoice-generator?mode=edit';
+    window.location.href = '/?mode=edit';
   };
 
   const handleDownloadPDF = async (invoice: Invoice) => {
