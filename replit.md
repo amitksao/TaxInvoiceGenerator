@@ -147,6 +147,7 @@ This is a full-stack web application built for generating professional tax invoi
 - January 7, 2025. Fixed signature box positioning in PDF invoices to ensure it stays within page boundaries with proper margins and page break handling
 - January 7, 2025. Optimized PDF layout to fit entire invoice including signature on a single page with compact spacing and reduced font sizes
 - January 8, 2025. Removed validation restrictions to allow negative values in all amount fields (tax return charges, accounting charges, audit fees, and additional charges)
+- January 8, 2025. Further optimized PDF layout for single-page invoices with reduced font sizes, compact spacing, and smaller logo to ensure all content fits on one page
 
 ## User Preferences
 
