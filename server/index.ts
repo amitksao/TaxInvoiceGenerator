@@ -1,61 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import helmet from "helmet";
-import { 
-  apiLimiter, 
-  authLimiter, 
-  securityHeaders, 
-  securityLogger,
-  validateEnvironment 
-} from "./security";
-
-// Validate environment before starting
-try {
-  validateEnvironment();
-} catch (error) {
-  console.error('❌ Environment validation failed:', error.message);
-  process.exit(1);
-}
 
 const app = express();
 
-// Configure trust proxy for production
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
-
-// Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      imgSrc: ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-    },
-  },
-  crossOriginEmbedderPolicy: false, // Disable for development
-}));
-
-// Additional security headers
-app.use(securityHeaders);
-
-// Security logging
-app.use(securityLogger);
-
-// Rate limiting
-app.use(apiLimiter);
-app.use('/api/auth', authLimiter);
-
-// Body parsing with size limits
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+// Body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
   const start = Date.now();

@@ -151,6 +151,7 @@ This is a full-stack web application built for generating professional tax invoi
 - January 9, 2025. Implemented comprehensive security audit and improvements including JWT security enhancements, input validation/sanitization, rate limiting, security headers, password strength requirements, environment validation, and security logging
 - January 9, 2025. Fixed deployment configuration issues: added proper environment validation with specific error messages, configured trust proxy for production rate limiting, improved error handling for server startup, and created comprehensive deployment documentation
 - July 9, 2025. Rolled back JWT_SECRET implementation to simpler version: removed production requirement check, simplified token generation/verification, removed user existence validation, and made JWT_SECRET optional for development
+- July 9, 2025. Completely reverted security features and authentication system: removed rate limiting, security headers, environment validation, and authentication requirements from both frontend and backend to restore basic functionality when invoice editing was working
 
 ## User Preferences
 
