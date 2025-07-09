@@ -3,13 +3,8 @@ import jwt from 'jsonwebtoken';
 import type { Request, Response, NextFunction } from 'express';
 import { storage } from './storage';
 
-const JWT_SECRET = process.env.JWT_SECRET || (() => {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('Missing JWT_SECRET environment variable in production at server/auth.ts');
-  }
-  return 'dev-secret-key-change-in-production';
-})();
-const SALT_ROUNDS = 12; // Increased for better security
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-change-in-production';
+const SALT_ROUNDS = 10;
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -28,36 +23,17 @@ export async function comparePassword(password: string, hashedPassword: string):
 
 export function generateToken(userId: number, username: string): string {
   return jwt.sign(
-    { 
-      userId, 
-      username,
-      iat: Math.floor(Date.now() / 1000),
-      type: 'access'
-    }, 
+    { userId, username }, 
     JWT_SECRET, 
-    { 
-      expiresIn: '24h', // Reduced from 7d for better security
-      issuer: 'invoice-app',
-      audience: 'invoice-app-users'
-    }
+    { expiresIn: '7d' }
   );
 }
 
 export function verifyToken(token: string): { userId: number; username: string } | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET, {
-      issuer: 'invoice-app',
-      audience: 'invoice-app-users'
-    }) as { userId: number; username: string; type: string };
-    
-    // Ensure it's an access token
-    if (decoded.type !== 'access') {
-      return null;
-    }
-    
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number; username: string };
     return { userId: decoded.userId, username: decoded.username };
   } catch (error) {
-    console.error('Token verification failed:', error);
     return null;
   }
 }
@@ -73,12 +49,6 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
   const decoded = verifyToken(token);
   if (!decoded) {
     return res.status(403).json({ message: 'Invalid or expired token' });
-  }
-
-  // Verify user still exists
-  const user = await storage.getUserById(decoded.userId);
-  if (!user) {
-    return res.status(403).json({ message: 'User not found' });
   }
 
   req.user = { id: decoded.userId, username: decoded.username };

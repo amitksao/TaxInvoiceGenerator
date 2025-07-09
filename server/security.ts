@@ -103,10 +103,6 @@ export function validateEnvironment(): void {
   const requiredEnvVars = ['DATABASE_URL'];
   const missingVars: string[] = [];
   
-  if (process.env.NODE_ENV === 'production') {
-    requiredEnvVars.push('JWT_SECRET');
-  }
-  
   requiredEnvVars.forEach(varName => {
     if (!process.env[varName]) {
       missingVars.push(varName);
@@ -114,7 +110,7 @@ export function validateEnvironment(): void {
   });
   
   if (missingVars.length > 0) {
-    const errorMessage = `Missing required environment variable${missingVars.length > 1 ? 's' : ''} in production: ${missingVars.join(', ')}`;
+    const errorMessage = `Missing required environment variable${missingVars.length > 1 ? 's' : ''}: ${missingVars.join(', ')}`;
     console.error(errorMessage);
     throw new Error(errorMessage);
   }
