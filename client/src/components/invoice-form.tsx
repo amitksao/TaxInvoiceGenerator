@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -42,6 +42,11 @@ export default function InvoiceForm({
     resolver: zodResolver(createInvoiceSchema),
     defaultValues: invoiceData,
   });
+
+  // Reset form when invoiceData changes (for edit mode)
+  useEffect(() => {
+    form.reset(invoiceData);
+  }, [invoiceData, form]);
 
   // Fetch clients for search
   const { data: clients } = useQuery({
