@@ -6,29 +6,69 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { authenticateToken, loginUser, registerUser, type AuthenticatedRequest } from "./auth";
 
+// Input sanitization function
+function sanitizeInput(input: any): any {
+  if (typeof input === 'string') {
+    return input.trim().replace(/[<>]/g, '');
+  }
+  if (typeof input === 'object' && input !== null) {
+    const sanitized: any = {};
+    for (const [key, value] of Object.entries(input)) {
+      sanitized[key] = sanitizeInput(value);
+    }
+    return sanitized;
+  }
+  return input;
+}
+
+// Validation middleware
+function validateAndSanitize(schema: z.ZodSchema) {
+  return (req: any, res: any, next: any) => {
+    try {
+      const sanitized = sanitizeInput(req.body);
+      req.body = schema.parse(sanitized);
+      next();
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: fromZodError(error).toString() });
+      }
+      return res.status(400).json({ message: 'Invalid request data' });
+    }
+  };
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", validateAndSanitize(loginSchema), async (req, res) => {
     try {
-      const { username, password } = loginSchema.parse(req.body);
+      const { username, password } = req.body;
       
+      // Add timing attack protection
+      const startTime = Date.now();
       const result = await loginUser(username, password);
+      const endTime = Date.now();
+      
+      // Ensure minimum response time to prevent timing attacks
+      const minResponseTime = 100; // 100ms minimum
+      const elapsed = endTime - startTime;
+      if (elapsed < minResponseTime) {
+        await new Promise(resolve => setTimeout(resolve, minResponseTime - elapsed));
+      }
+      
       if (!result) {
         return res.status(401).json({ message: "Invalid username or password" });
       }
       
       res.json(result);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: fromZodError(error).toString() });
-      }
+      console.error('Login error:', error);
       res.status(500).json({ message: "Login failed" });
     }
   });
 
-  app.post("/api/auth/register", async (req, res) => {
+  app.post("/api/auth/register", validateAndSanitize(registerSchema), async (req, res) => {
     try {
-      const { username, password } = registerSchema.parse(req.body);
+      const { username, password } = req.body;
       
       // Check if user already exists
       const existingUser = await storage.getUserByUsername(username);
@@ -39,9 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await registerUser(username, password);
       res.status(201).json(result);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: fromZodError(error).toString() });
-      }
+      console.error('Registration error:', error);
       res.status(500).json({ message: "Registration failed" });
     }
   });
@@ -52,9 +90,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Protected routes - require authentication
   // Create invoice
-  app.post("/api/invoices", authenticateToken, async (req, res) => {
+  app.post("/api/invoices", authenticateToken, validateAndSanitize(createInvoiceSchema), async (req: AuthenticatedRequest, res) => {
     try {
-      const parsed = createInvoiceSchema.parse(req.body);
+      const parsed = req.body;
       
       const invoiceData = {
         assessmentYear: parsed.assessmentYear,
@@ -75,22 +113,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(invoice);
     } catch (error) {
       console.error('Invoice creation error:', error);
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ message: fromZodError(error).toString() });
-      } else {
-        res.status(500).json({ message: "Failed to create invoice" });
-      }
+      res.status(500).json({ message: "Failed to create invoice" });
     }
   });
 
   // Get all invoices - protected
-  app.get("/api/invoices", authenticateToken, async (req, res) => {
+  app.get("/api/invoices", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
       const { search, clientId } = req.query;
+      
+      // Validate query parameters
+      if (search && typeof search !== 'string') {
+        return res.status(400).json({ message: "Invalid search parameter" });
+      }
+      if (clientId && typeof clientId !== 'string') {
+        return res.status(400).json({ message: "Invalid clientId parameter" });
+      }
+      
       let invoices = await storage.getInvoices();
       
       // Filter by client ID if provided
-      if (clientId && typeof clientId === 'string') {
+      if (clientId) {
         const id = parseInt(clientId);
         if (!isNaN(id)) {
           invoices = invoices.filter(invoice => 
@@ -101,35 +144,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Filter by search query if provided
-      if (search && typeof search === 'string') {
-        const query = search.toLowerCase();
-        invoices = invoices.filter(invoice =>
-          invoice.invoiceNumber.toLowerCase().includes(query) ||
-          invoice.clientName.toLowerCase().includes(query) ||
-          invoice.clientEmail?.toLowerCase().includes(query) ||
-          invoice.clientPhone?.includes(query) ||
-          invoice.assessmentYear.includes(query) ||
-          invoice.clientCity?.toLowerCase().includes(query) ||
-          invoice.clientState?.toLowerCase().includes(query)
-        );
+      // Search functionality
+      if (search) {
+        invoices = await storage.searchInvoices(search.trim());
       }
       
       res.json(invoices);
     } catch (error) {
+      console.error('Get invoices error:', error);
       res.status(500).json({ message: "Failed to fetch invoices" });
     }
   });
 
   // Update invoice - protected
-  app.put("/api/invoices/:id", authenticateToken, async (req, res) => {
+  app.put("/api/invoices/:id", authenticateToken, validateAndSanitize(createInvoiceSchema), async (req: AuthenticatedRequest, res) => {
     try {
       const invoiceId = parseInt(req.params.id);
       if (isNaN(invoiceId)) {
         return res.status(400).json({ message: "Invalid invoice ID" });
       }
 
-      const parsed = createInvoiceSchema.parse(req.body);
+      const parsed = req.body;
       
       const invoiceData = {
         assessmentYear: parsed.assessmentYear,
@@ -154,11 +189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedInvoice);
     } catch (error) {
       console.error('Invoice update error:', error);
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ message: fromZodError(error).toString() });
-      } else {
-        res.status(500).json({ message: "Failed to update invoice" });
-      }
+      res.status(500).json({ message: "Failed to update invoice" });
     }
   });
 

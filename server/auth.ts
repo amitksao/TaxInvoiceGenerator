@@ -3,8 +3,13 @@ import jwt from 'jsonwebtoken';
 import type { Request, Response, NextFunction } from 'express';
 import { storage } from './storage';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const SALT_ROUNDS = 10;
+const JWT_SECRET = process.env.JWT_SECRET || (() => {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production');
+  }
+  return 'dev-secret-key-change-in-production';
+})();
+const SALT_ROUNDS = 12; // Increased for better security
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -22,13 +27,37 @@ export async function comparePassword(password: string, hashedPassword: string):
 }
 
 export function generateToken(userId: number, username: string): string {
-  return jwt.sign({ userId, username }, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(
+    { 
+      userId, 
+      username,
+      iat: Math.floor(Date.now() / 1000),
+      type: 'access'
+    }, 
+    JWT_SECRET, 
+    { 
+      expiresIn: '24h', // Reduced from 7d for better security
+      issuer: 'invoice-app',
+      audience: 'invoice-app-users'
+    }
+  );
 }
 
 export function verifyToken(token: string): { userId: number; username: string } | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as { userId: number; username: string };
-  } catch {
+    const decoded = jwt.verify(token, JWT_SECRET, {
+      issuer: 'invoice-app',
+      audience: 'invoice-app-users'
+    }) as { userId: number; username: string; type: string };
+    
+    // Ensure it's an access token
+    if (decoded.type !== 'access') {
+      return null;
+    }
+    
+    return { userId: decoded.userId, username: decoded.username };
+  } catch (error) {
+    console.error('Token verification failed:', error);
     return null;
   }
 }

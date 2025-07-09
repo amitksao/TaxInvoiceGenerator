@@ -75,13 +75,20 @@ export const users = pgTable("users", {
 });
 
 export const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
+  username: z.string().min(1, "Username is required").max(50, "Username too long"),
+  password: z.string().min(1, "Password is required").max(128, "Password too long"),
 });
 
 export const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  username: z.string()
+    .min(3, "Username must be at least 3 characters")
+    .max(50, "Username too long")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128, "Password too long")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
+           "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
 });
 
 export type User = typeof users.$inferSelect;
