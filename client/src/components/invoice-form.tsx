@@ -478,7 +478,6 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                           <Input
                             type="number"
                             step="0.01"
-                            min="0"
                             className="pl-8"
                             placeholder="0.00"
                             {...field}
@@ -509,7 +508,6 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                           <Input
                             type="number"
                             step="0.01"
-                            min="0"
                             className="pl-8"
                             placeholder="0.00"
                             {...field}
@@ -540,7 +538,6 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                           <Input
                             type="number"
                             step="0.01"
-                            min="0"
                             className="pl-8"
                             placeholder="0.00"
                             {...field}
@@ -583,7 +580,6 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
                       <Input
                         type="number"
                         step="0.01"
-                        min="0"
                         className="pl-8"
                         placeholder="0.00"
                         value={invoiceData.additionalCharges[index].amount || ''}

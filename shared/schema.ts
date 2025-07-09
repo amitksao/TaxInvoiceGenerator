@@ -23,7 +23,7 @@ export const invoices = pgTable("invoices", {
 
 export const additionalChargeSchema = z.object({
   label: z.string(),
-  amount: z.number().min(0),
+  amount: z.number(),
 });
 
 export const insertInvoiceSchema = createInsertSchema(invoices, {

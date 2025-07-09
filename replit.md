@@ -146,6 +146,7 @@ This is a full-stack web application built for generating professional tax invoi
 - January 7, 2025. Resolved PDF currency formatting issues by replacing Unicode Rupee symbol with "Rs." to avoid jsPDF rendering problems
 - January 7, 2025. Fixed signature box positioning in PDF invoices to ensure it stays within page boundaries with proper margins and page break handling
 - January 7, 2025. Optimized PDF layout to fit entire invoice including signature on a single page with compact spacing and reduced font sizes
+- January 8, 2025. Removed validation restrictions to allow negative values in all amount fields (tax return charges, accounting charges, audit fees, and additional charges)
 
 ## User Preferences
 
