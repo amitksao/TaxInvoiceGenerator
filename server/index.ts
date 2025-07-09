@@ -11,9 +11,19 @@ import {
 } from "./security";
 
 // Validate environment before starting
-validateEnvironment();
+try {
+  validateEnvironment();
+} catch (error) {
+  console.error('❌ Environment validation failed:', error.message);
+  process.exit(1);
+}
 
 const app = express();
+
+// Configure trust proxy for production
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // Security middleware
 app.use(helmet({
@@ -107,5 +117,11 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+  }).on('error', (err) => {
+    console.error('❌ Server failed to start:', err);
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${port} is already in use`);
+    }
+    process.exit(1);
   });
 })();

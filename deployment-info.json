@@ -1,0 +1,7 @@
+{
+  "timestamp": "2025-07-09T14:30:51.948Z",
+  "nodeEnv": "development",
+  "jwtSecretConfigured": true,
+  "databaseUrlConfigured": true,
+  "version": "1.0.0"
+}

@@ -5,7 +5,7 @@ import { storage } from './storage';
 
 const JWT_SECRET = process.env.JWT_SECRET || (() => {
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('JWT_SECRET environment variable is required in production');
+    throw new Error('Missing JWT_SECRET environment variable in production at server/auth.ts');
   }
   return 'dev-secret-key-change-in-production';
 })();

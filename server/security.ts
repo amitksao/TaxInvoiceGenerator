@@ -26,7 +26,7 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  trustProxy: false,
+  trustProxy: process.env.NODE_ENV === 'production', // Enable trust proxy in production
 });
 
 // Authentication rate limiting
@@ -39,7 +39,7 @@ export const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  trustProxy: false,
+  trustProxy: process.env.NODE_ENV === 'production', // Enable trust proxy in production
 });
 
 // Input validation and sanitization
@@ -100,14 +100,26 @@ export function sanitizeForHTML(input: string): string {
 
 // Environment validation
 export function validateEnvironment(): void {
+  const requiredEnvVars = ['DATABASE_URL'];
+  const missingVars: string[] = [];
+  
   if (process.env.NODE_ENV === 'production') {
-    if (!process.env.JWT_SECRET) {
-      throw new Error('JWT_SECRET must be set in production');
-    }
-    if (!process.env.DATABASE_URL) {
-      throw new Error('DATABASE_URL must be set in production');
-    }
+    requiredEnvVars.push('JWT_SECRET');
   }
+  
+  requiredEnvVars.forEach(varName => {
+    if (!process.env[varName]) {
+      missingVars.push(varName);
+    }
+  });
+  
+  if (missingVars.length > 0) {
+    const errorMessage = `Missing required environment variable${missingVars.length > 1 ? 's' : ''} in production: ${missingVars.join(', ')}`;
+    console.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+  
+  console.log('✅ Environment validation passed');
 }
 
 // Request logging for security monitoring
