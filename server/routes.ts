@@ -121,6 +121,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update invoice - protected
+  app.put("/api/invoices/:id", authenticateToken, async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.id);
+      if (isNaN(invoiceId)) {
+        return res.status(400).json({ message: "Invalid invoice ID" });
+      }
+
+      const parsed = createInvoiceSchema.parse(req.body);
+      
+      const invoiceData = {
+        assessmentYear: parsed.assessmentYear,
+        clientName: parsed.clientName,
+        clientAddress: parsed.clientAddress,
+        clientCity: parsed.clientCity,
+        clientState: parsed.clientState,
+        clientPin: parsed.clientPin,
+        clientEmail: parsed.clientEmail,
+        clientPhone: parsed.clientPhone,
+        taxReturnCharges: parsed.taxReturnCharges,
+        accountingCharges: parsed.accountingCharges || "0",
+        auditFee: parsed.auditFee || "0",
+        additionalCharges: JSON.stringify(parsed.additionalCharges || []),
+      };
+      
+      const updatedInvoice = await storage.updateInvoice(invoiceId, invoiceData);
+      if (!updatedInvoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      res.json(updatedInvoice);
+    } catch (error) {
+      console.error('Invoice update error:', error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: fromZodError(error).toString() });
+      } else {
+        res.status(500).json({ message: "Failed to update invoice" });
+      }
+    }
+  });
+
   // Get single invoice
   app.get("/api/invoices/:id", authenticateToken, async (req, res) => {
     try {

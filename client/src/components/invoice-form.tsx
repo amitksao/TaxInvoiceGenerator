@@ -20,10 +20,19 @@ import { generateInvoicePDF } from "@/lib/pdf-generator";
 interface InvoiceFormProps {
   invoiceData: CreateInvoice;
   setInvoiceData: (data: CreateInvoice) => void;
+  editMode?: boolean;
+  editInvoiceId?: number | null;
+  originalInvoiceNumber?: string;
 }
 
-export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceFormProps) {
-  const [invoiceNumber] = useState(`INV-${new Date().getFullYear()}-001`);
+export default function InvoiceForm({ 
+  invoiceData, 
+  setInvoiceData, 
+  editMode = false, 
+  editInvoiceId = null,
+  originalInvoiceNumber = ""
+}: InvoiceFormProps) {
+  const [invoiceNumber] = useState(editMode ? originalInvoiceNumber : `INV-${new Date().getFullYear()}-001`);
   const [isClientSearchOpen, setIsClientSearchOpen] = useState(false);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const { toast } = useToast();
@@ -87,6 +96,53 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
     },
   });
 
+  const updateInvoiceMutation = useMutation({
+    mutationFn: async (data: CreateInvoice) => {
+      const response = await apiRequest("PUT", `/api/invoices/${editInvoiceId}`, data);
+      return await response.json();
+    },
+    onSuccess: (invoice) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      
+      // Generate and download PDF to local download folder
+      try {
+        const filename = `${invoice.clientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
+        
+        generateInvoicePDF(invoice);
+        
+        toast({
+          title: "Invoice Updated",
+          description: `Invoice updated and PDF downloaded to your Downloads folder as: ${filename}`,
+        });
+        
+        // Navigate back to invoice history after successful update
+        setTimeout(() => {
+          window.location.href = '/invoices';
+        }, 2000);
+        
+      } catch (error) {
+        console.error("PDF download error:", error);
+        toast({
+          title: "Invoice Updated",
+          description: "Invoice updated successfully, but PDF download failed. Try downloading from invoice history.",
+          variant: "destructive",
+        });
+        
+        // Navigate back to invoice history after successful update
+        setTimeout(() => {
+          window.location.href = '/invoices';
+        }, 2000);
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const calculateTotal = () => {
     const taxReturn = parseFloat(invoiceData.taxReturnCharges || "0");
     const accounting = parseFloat(invoiceData.accountingCharges || "0");
@@ -138,7 +194,11 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
       return;
     }
 
-    createInvoiceMutation.mutate(data);
+    if (editMode) {
+      updateInvoiceMutation.mutate(data);
+    } else {
+      createInvoiceMutation.mutate(data);
+    }
   };
 
   const handlePreview = () => {
@@ -183,7 +243,9 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
     <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Create Invoice</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {editMode ? "Edit Invoice" : "Create Invoice"}
+          </h2>
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <span>Invoice #</span>
             <span className="font-mono bg-gray-100 px-2 py-1 rounded">{invoiceNumber}</span>
@@ -616,11 +678,14 @@ export default function InvoiceForm({ invoiceData, setInvoiceData }: InvoiceForm
               </Button>
               <Button
                 type="submit"
-                disabled={createInvoiceMutation.isPending}
+                disabled={createInvoiceMutation.isPending || updateInvoiceMutation.isPending}
                 className="flex items-center justify-center px-6 py-3"
               >
                 <FileText className="w-4 h-4 mr-2" />
-                {createInvoiceMutation.isPending ? "Generating..." : "Generate & Download PDF"}
+                {editMode 
+                  ? (updateInvoiceMutation.isPending ? "Updating..." : "Update & Download PDF")
+                  : (createInvoiceMutation.isPending ? "Generating..." : "Generate & Download PDF")
+                }
               </Button>
             </div>
           </form>

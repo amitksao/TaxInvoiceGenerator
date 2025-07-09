@@ -21,6 +21,7 @@ export interface IStorage {
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
   getInvoice(id: number): Promise<Invoice | undefined>;
   getInvoices(): Promise<Invoice[]>;
+  updateInvoice(id: number, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined>;
   searchInvoices(query: string): Promise<Invoice[]>;
   getInvoicesByClient(clientId: number): Promise<Invoice[]>;
   deleteInvoice(id: number): Promise<boolean>;
@@ -116,6 +117,33 @@ export class MemStorage implements IStorage {
 
   async getInvoices(): Promise<Invoice[]> {
     return Array.from(this.invoices.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async updateInvoice(id: number, updateData: Partial<InsertInvoice>): Promise<Invoice | undefined> {
+    const invoice = this.invoices.get(id);
+    if (!invoice) return undefined;
+    
+    // Calculate new total if fee data is being updated
+    let totalAmount = invoice.totalAmount;
+    if (updateData.taxReturnCharges || updateData.accountingCharges || updateData.auditFee || updateData.additionalCharges) {
+      const taxReturn = parseFloat(updateData.taxReturnCharges || invoice.taxReturnCharges);
+      const accounting = parseFloat(updateData.accountingCharges || invoice.accountingCharges || "0");
+      const audit = parseFloat(updateData.auditFee || invoice.auditFee || "0");
+      
+      const additionalCharges = updateData.additionalCharges ? JSON.parse(updateData.additionalCharges) : JSON.parse(invoice.additionalCharges);
+      const additionalTotal = additionalCharges.reduce((sum: number, charge: any) => sum + (charge.amount || 0), 0);
+      
+      totalAmount = (taxReturn + accounting + audit + additionalTotal).toFixed(2);
+    }
+    
+    const updatedInvoice: Invoice = {
+      ...invoice,
+      ...updateData,
+      totalAmount,
+    };
+    
+    this.invoices.set(id, updatedInvoice);
+    return updatedInvoice;
   }
 
   async createClient(insertClient: InsertClient): Promise<Client> {
@@ -294,6 +322,50 @@ export class DatabaseStorage implements IStorage {
 
   async getInvoices(): Promise<Invoice[]> {
     return await db.select().from(invoices).orderBy(desc(invoices.createdAt));
+  }
+
+  async updateInvoice(id: number, updateData: Partial<InsertInvoice>): Promise<Invoice | undefined> {
+    try {
+      // Calculate new total if fee data is being updated
+      let totalAmount: string | undefined;
+      if (updateData.taxReturnCharges || updateData.accountingCharges || updateData.auditFee || updateData.additionalCharges) {
+        // Get current invoice to merge with new data
+        const currentInvoice = await this.getInvoice(id);
+        if (!currentInvoice) return undefined;
+        
+        const taxReturn = parseFloat(updateData.taxReturnCharges || currentInvoice.taxReturnCharges);
+        const accounting = parseFloat(updateData.accountingCharges || currentInvoice.accountingCharges || "0");
+        const audit = parseFloat(updateData.auditFee || currentInvoice.auditFee || "0");
+        
+        let additionalCharges = [];
+        try {
+          const chargesData = updateData.additionalCharges || currentInvoice.additionalCharges;
+          additionalCharges = typeof chargesData === 'string' ? JSON.parse(chargesData) : chargesData || [];
+        } catch (error) {
+          console.error('Error parsing additional charges:', error);
+          additionalCharges = [];
+        }
+        const additionalTotal = additionalCharges.reduce((sum: number, charge: any) => sum + (charge.amount || 0), 0);
+        
+        totalAmount = (taxReturn + accounting + audit + additionalTotal).toFixed(2);
+      }
+      
+      const updatePayload: any = { ...updateData };
+      if (totalAmount) {
+        updatePayload.totalAmount = totalAmount;
+      }
+      
+      const [invoice] = await db
+        .update(invoices)
+        .set(updatePayload)
+        .where(eq(invoices.id, id))
+        .returning();
+      
+      return invoice || undefined;
+    } catch (error) {
+      console.error('Database error in updateInvoice:', error);
+      throw error;
+    }
   }
 
   async createClient(insertClient: InsertClient): Promise<Client> {

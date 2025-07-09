@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Calculator, Calendar, Download } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calculator, Calendar, Download, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import InvoiceForm from "@/components/invoice-form";
 import InvoicePreview from "@/components/invoice-preview";
@@ -10,6 +10,10 @@ import logoImage from "@assets/8944800c-f7c0-4823-a996-e72890d14956_175080331994
 
 export default function InvoiceGenerator() {
   const { toast } = useToast();
+  const [editMode, setEditMode] = useState(false);
+  const [editInvoiceId, setEditInvoiceId] = useState<number | null>(null);
+  const [originalInvoiceNumber, setOriginalInvoiceNumber] = useState<string>("");
+  
   const [invoiceData, setInvoiceData] = useState<CreateInvoice>({
     assessmentYear: "",
     clientName: "",
@@ -28,6 +32,55 @@ export default function InvoiceGenerator() {
       { label: "", amount: 0 },
     ],
   });
+
+  // Check for edit mode on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    
+    if (mode === 'edit') {
+      const editData = sessionStorage.getItem('editInvoiceData');
+      if (editData) {
+        try {
+          const parsedData = JSON.parse(editData);
+          setEditMode(true);
+          setEditInvoiceId(parsedData.id);
+          setOriginalInvoiceNumber(parsedData.invoiceNumber);
+          
+          // Ensure additional charges array has 3 items
+          const additionalCharges = parsedData.additionalCharges || [];
+          while (additionalCharges.length < 3) {
+            additionalCharges.push({ label: "", amount: 0 });
+          }
+          
+          setInvoiceData({
+            assessmentYear: parsedData.assessmentYear || "",
+            clientName: parsedData.clientName || "",
+            clientAddress: parsedData.clientAddress || "",
+            clientCity: parsedData.clientCity || "",
+            clientState: parsedData.clientState || "",
+            clientPin: parsedData.clientPin || "",
+            clientEmail: parsedData.clientEmail || "",
+            clientPhone: parsedData.clientPhone || "",
+            taxReturnCharges: parsedData.taxReturnCharges || "",
+            accountingCharges: parsedData.accountingCharges || "",
+            auditFee: parsedData.auditFee || "",
+            additionalCharges: additionalCharges.slice(0, 3),
+          });
+          
+          // Clear sessionStorage after loading
+          sessionStorage.removeItem('editInvoiceData');
+        } catch (error) {
+          console.error('Error parsing edit data:', error);
+          toast({
+            title: "Error Loading Invoice",
+            description: "Failed to load invoice data for editing.",
+            variant: "destructive",
+          });
+        }
+      }
+    }
+  }, [toast]);
 
   const handleDownloadPreview = () => {
     if (!invoiceData.clientName || !invoiceData.assessmentYear) {
@@ -82,6 +135,10 @@ export default function InvoiceGenerator() {
     }
   };
 
+  const handleBackToHistory = () => {
+    window.location.href = '/invoices';
+  };
+
   const currentDate = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -95,6 +152,17 @@ export default function InvoiceGenerator() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              {editMode && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBackToHistory}
+                  className="mr-2"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-1" />
+                  Back to History
+                </Button>
+              )}
               <div className="w-12 h-12 rounded-lg overflow-hidden">
                 <img 
                   src={logoImage} 
@@ -103,8 +171,12 @@ export default function InvoiceGenerator() {
                 />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Dipak Kumar Sao & Associates</h1>
-                <p className="text-sm text-app-secondary">Tax Invoice Generator</p>
+                <h1 className="text-xl font-bold text-gray-900">
+                  {editMode ? `Edit Invoice ${originalInvoiceNumber}` : "Dipak Kumar Sao & Associates"}
+                </h1>
+                <p className="text-sm text-app-secondary">
+                  {editMode ? "Update invoice details and charges" : "Tax Invoice Generator"}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -118,7 +190,13 @@ export default function InvoiceGenerator() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <InvoiceForm invoiceData={invoiceData} setInvoiceData={setInvoiceData} />
+          <InvoiceForm 
+            invoiceData={invoiceData} 
+            setInvoiceData={setInvoiceData} 
+            editMode={editMode}
+            editInvoiceId={editInvoiceId}
+            originalInvoiceNumber={originalInvoiceNumber}
+          />
           
           {/* Preview Section with Download */}
           <div className="space-y-4">

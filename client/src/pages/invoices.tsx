@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, FileText, Download, Calendar, User, Trash2 } from "lucide-react";
+import { Search, FileText, Download, Calendar, User, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -74,6 +74,32 @@ export default function Invoices() {
 
   const handleDeleteInvoice = (invoiceId: number) => {
     deleteInvoiceMutation.mutate(invoiceId);
+  };
+
+  const handleEditInvoice = (invoice: Invoice) => {
+    // Navigate to invoice generator with pre-populated data
+    const editData = {
+      id: invoice.id,
+      assessmentYear: invoice.assessmentYear,
+      clientName: invoice.clientName,
+      clientAddress: invoice.clientAddress || "",
+      clientCity: invoice.clientCity || "",
+      clientState: invoice.clientState || "",
+      clientPin: invoice.clientPin || "",
+      clientEmail: invoice.clientEmail || "",
+      clientPhone: invoice.clientPhone || "",
+      taxReturnCharges: invoice.taxReturnCharges,
+      accountingCharges: invoice.accountingCharges || "0",
+      auditFee: invoice.auditFee || "0",
+      additionalCharges: JSON.parse(invoice.additionalCharges || '[]'),
+      invoiceNumber: invoice.invoiceNumber
+    };
+    
+    // Store the edit data in sessionStorage to pass to the generator
+    sessionStorage.setItem('editInvoiceData', JSON.stringify(editData));
+    
+    // Navigate to invoice generator
+    window.location.href = '/invoice-generator?mode=edit';
   };
 
   const handleDownloadPDF = async (invoice: Invoice) => {
@@ -205,6 +231,19 @@ export default function Invoices() {
                         {formatCurrency(parseFloat(invoice.totalAmount))}
                       </div>
                       <div className="flex gap-2 mt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleEditInvoice(invoice);
+                          }}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                        
                         <Button
                           size="sm"
                           variant="outline"
