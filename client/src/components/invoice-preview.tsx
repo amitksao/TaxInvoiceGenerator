@@ -37,22 +37,22 @@ export default function InvoicePreview({ invoiceData }: InvoicePreviewProps) {
     const services = [];
     
     const taxReturn = parseFloat(invoiceData.taxReturnCharges || "0");
-    if (taxReturn > 0) {
+    if (taxReturn !== 0) {
       services.push({ description: "Tax Return Filing", amount: taxReturn });
     }
     
     const accounting = parseFloat(invoiceData.accountingCharges || "0");
-    if (accounting > 0) {
+    if (accounting !== 0) {
       services.push({ description: "Accounting Services", amount: accounting });
     }
     
     const audit = parseFloat(invoiceData.auditFee || "0");
-    if (audit > 0) {
+    if (audit !== 0) {
       services.push({ description: "Audit Services", amount: audit });
     }
     
     invoiceData.additionalCharges.forEach((charge) => {
-      if (charge.label && charge.amount > 0) {
+      if (charge.label && charge.amount !== 0) {
         services.push({ description: charge.label, amount: charge.amount });
       }
     });

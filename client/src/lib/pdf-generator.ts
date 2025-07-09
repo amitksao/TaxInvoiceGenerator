@@ -103,21 +103,21 @@ export function generateInvoicePDF(invoice: Invoice) {
   const additionalCharges = JSON.parse(invoice.additionalCharges);
   
   // Tax return charges
-  if (parseFloat(invoice.taxReturnCharges) > 0) {
+  if (parseFloat(invoice.taxReturnCharges) !== 0) {
     doc.text('Tax Return Filing', 20, yPosition);
     doc.text(formatCurrencyForPDF(parseFloat(invoice.taxReturnCharges)), 150, yPosition);
     yPosition += 8;
   }
   
   // Accounting charges
-  if (parseFloat(invoice.accountingCharges || '0') > 0) {
+  if (parseFloat(invoice.accountingCharges || '0') !== 0) {
     doc.text('Accounting Services', 20, yPosition);
     doc.text(formatCurrencyForPDF(parseFloat(invoice.accountingCharges!)), 150, yPosition);
     yPosition += 8;
   }
   
   // Audit fee
-  if (parseFloat(invoice.auditFee || '0') > 0) {
+  if (parseFloat(invoice.auditFee || '0') !== 0) {
     doc.text('Audit Services', 20, yPosition);
     doc.text(formatCurrencyForPDF(parseFloat(invoice.auditFee!)), 150, yPosition);
     yPosition += 8;
@@ -125,7 +125,7 @@ export function generateInvoicePDF(invoice: Invoice) {
   
   // Additional charges
   additionalCharges.forEach((charge: any) => {
-    if (charge.label && charge.amount > 0) {
+    if (charge.label && charge.amount !== 0) {
       doc.text(charge.label, 20, yPosition);
       doc.text(formatCurrencyForPDF(charge.amount), 150, yPosition);
       yPosition += 8;
@@ -178,86 +178,11 @@ export function generateInvoicePDF(invoice: Invoice) {
     filename = `${clientName}_${invoice.invoiceNumber}_${invoice.assessmentYear}.pdf`;
   }
   
-  // Aggressive download approach - multiple simultaneous methods
-  console.log(`Attempting PDF download: ${filename}`);
+  // Single download method to prevent multiple downloads
+  console.log(`Downloading PDF: ${filename}`);
   
-  // Create blob first (most reliable)
-  const pdfBlob = doc.output('blob');
-  const blobUrl = URL.createObjectURL(pdfBlob);
+  // Use only jsPDF's native save method
+  doc.save(filename);
   
-  // Method 1: Native jsPDF save
-  try {
-    doc.save(filename);
-    console.log(`✓ jsPDF save attempted: ${filename}`);
-  } catch (e) {
-    console.warn('jsPDF save failed:', e);
-  }
-  
-  // Method 2: Blob download with aggressive click simulation
-  const downloadLink = document.createElement('a');
-  downloadLink.href = blobUrl;
-  downloadLink.download = filename;
-  downloadLink.style.position = 'fixed';
-  downloadLink.style.top = '-1000px';
-  downloadLink.style.left = '-1000px';
-  
-  // Attach to DOM
-  document.body.appendChild(downloadLink);
-  
-  // Multiple click attempts
-  downloadLink.click();
-  
-  // Force click events
-  ['mousedown', 'mouseup', 'click'].forEach(eventType => {
-    const event = new MouseEvent(eventType, {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-      buttons: 1
-    });
-    downloadLink.dispatchEvent(event);
-  });
-  
-  console.log(`✓ Blob download attempted: ${filename}`);
-  
-  // Method 3: Data URI approach (immediate)
-  setTimeout(() => {
-    try {
-      const dataUri = doc.output('datauristring');
-      const dataLink = document.createElement('a');
-      dataLink.href = dataUri;
-      dataLink.download = filename;
-      document.body.appendChild(dataLink);
-      dataLink.click();
-      document.body.removeChild(dataLink);
-      console.log(`✓ Data URI download attempted: ${filename}`);
-    } catch (e) {
-      console.warn('Data URI download failed:', e);
-    }
-  }, 50);
-  
-  // Method 4: Window.open approach (last resort)
-  setTimeout(() => {
-    try {
-      const newWindow = window.open(blobUrl, '_blank');
-      if (newWindow) {
-        newWindow.document.title = filename;
-        console.log(`✓ Window.open attempted: ${filename}`);
-      }
-    } catch (e) {
-      console.warn('Window.open failed:', e);
-    }
-  }, 100);
-  
-  // Cleanup after delay
-  setTimeout(() => {
-    try {
-      document.body.removeChild(downloadLink);
-    } catch (e) {
-      // Link may already be removed
-    }
-    URL.revokeObjectURL(blobUrl);
-  }, 5000);
-  
-  console.log(`📄 PDF download process completed for: ${filename}`);
+  console.log(`✓ PDF download completed: ${filename}`);
 }
