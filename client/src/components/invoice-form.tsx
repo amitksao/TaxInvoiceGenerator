@@ -190,14 +190,6 @@ export default function InvoiceForm({
       return;
     }
 
-    if (!data.taxReturnCharges || parseFloat(data.taxReturnCharges) <= 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter Tax Return Charges",
-        variant: "destructive",
-      });
-      return;
-    }
 
     if (editMode) {
       updateInvoiceMutation.mutate(data);
@@ -281,6 +273,7 @@ export default function InvoiceForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem value="2026-27">2026-27</SelectItem>
                       <SelectItem value="2025-26">2025-26</SelectItem>
                       <SelectItem value="2024-25">2024-25</SelectItem>
                       <SelectItem value="2023-24">2023-24</SelectItem>
@@ -537,7 +530,7 @@ export default function InvoiceForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">
-                        Tax Return Charges <span className="text-red-500">*</span>
+                        Tax Return Charges
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
